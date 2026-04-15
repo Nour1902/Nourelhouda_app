@@ -61,7 +61,7 @@ public class AuthBean implements Serializable {
         if (u.getRole() == Role.Admin) {
             return "/EspaceAdmin/dashboardAdmin.xhtml?faces-redirect=true";
         } else {
-            return "/dashboardUser.xhtml?faces-redirect=true";
+            return "/EspaceUser/dashboardUser.xhtml?faces-redirect=true";
         }
     }
 

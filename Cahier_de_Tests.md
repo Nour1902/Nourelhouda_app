@@ -17,6 +17,7 @@
 | 🟠 MOYENNE | Calcul de l'heure d'Imsak à partir du Fajr | `HorairePriereTest` |
 | 🟠 MOYENNE | Traduction Numéro → Nom de Mois Hijri en Arabe | `PrayerTimeServiceTest` |
 | 🟡 NORMALE | Calcul du % de Régularité et de Progrès sans division par zéro | `UserStatsBeanTest` |
+| 🟡 NORMALE | Logique de Navigation et Redirection par Rôle | `AuthBeanTest` |
 
 ---
 
@@ -104,8 +105,23 @@
 | T5.4 | Progression quotidienne standard | 3 actes / 10 total | 30% | 30% | ✅ |
 | T5.5 | Progression si base vide (totalActes=0) | 0 actes / 0 total | 0% (pas d'exception) | 0% | ✅ |
 
-**Anomalie détectée :** Lors du premier déploiement, si la table `actes_adoration` était vide, la page Dashboard crashait avec une `ArithmeticException: / by zero`.  
 **Correction apportée :** Ajout d'une condition de garde `if (totalActes > 0)` avant tout calcul de pourcentage dans les méthodes de calcul de progrès.
+
+---
+
+### Scénario 6 — `AuthBeanTest` : Logique de Navigation (Redirection)
+
+**Fonctionnalité testée :** `AuthBean.determinerRedirection(Utilisateur u)`  
+**Objectif :** Valider que chaque utilisateur est redirigé vers l'espace correspondant à son rôle (Admin ou User) et gérer les cas de session invalide (u = null).
+
+| ID | Nom du Cas | Entrée (Rôle) | Résultat Attendu | Résultat Obtenu | Statut |
+|---|---|---|---|---|---|
+| T6.1 | Redirection Admin | `Role.Admin` | `/EspaceAdmin/dashboardAdmin.xhtml...` | Conforme | ✅ |
+| T6.2 | Redirection Utilisateur | `Role.User` | `/EspaceUser/dashboardUser.xhtml...` | Conforme | ✅ |
+| T6.3 | Utilisateur non trouvé (null) | `null` | `null` (Reste sur la page avec erreur) | Conforme | ✅ |
+
+**Anomalie détectée :** Lors d'un test croisé, il a été remarqué que le chemin pour le dashboard utilisateur était codé en dur sans le préfixe `/EspaceUser/`, ce qui empêchait la redirection correcte.  
+**Correction apportée :** Refactorisation de `AuthBean.java` pour utiliser le chemin complet relatif à la structure du projet Web.
 
 ---
 
@@ -114,6 +130,7 @@
 ```
 src/test/java/com/example/nourelhoudaapp/
 ├── Controllers/
+│   ├── AuthBeanTest.java          (Scénario 6 — Navigation)
 │   └── UserStatsBeanTest.java     (Scénario 5 — Statistiques)
 ├── DAO/
 │   └── AuthDAOTest.java           (Scénario 1 — Sécurité)
@@ -131,4 +148,4 @@ Ces tests sont **isolés** de toute dépendance externe (réseau, base de donné
 mvn test
 ```
 
-Le résultat attendu est `BUILD SUCCESS` avec `Tests run: 14, Failures: 0, Errors: 0`.
+Le résultat attendu est `BUILD SUCCESS` avec `Tests run: 23, Failures: 0, Errors: 0`.
