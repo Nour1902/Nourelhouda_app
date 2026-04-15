@@ -1,4 +1,5 @@
 package com.example.nourelhoudaapp.Controllers;
+
 import com.example.nourelhoudaapp.DAO.AuthDAO;
 import com.example.nourelhoudaapp.DAO.UtilisateurDAO;
 import com.example.nourelhoudaapp.entites.Utilisateur;
@@ -29,29 +30,38 @@ public class AuthBean implements Serializable {
         this.user = user;
     }
 
-    //constrecteur
-    public AuthBean(){
-        user=new Utilisateur();
-        authDAO=new AuthDAO();
+    // constrecteur
+    public AuthBean() {
+        user = new Utilisateur();
+        authDAO = new AuthDAO();
     }
 
     public String Connecter() {
+        // 1. La partie qui a besoin de la BDD (DAO)
         Utilisateur utilisateurConnecter = authDAO.Connexion(user.getEmail(), user.getPassword());
-        if (utilisateurConnecter != null) {
-            // ✅ Sauvegarder l'utilisateur connecté dans la session
-            this.user = utilisateurConnecter;
 
-            // ✅ Rediriger selon le rôle
-            if (utilisateurConnecter.getRole() == Role.Admin) {
-                return "/EspaceAdmin/dashboardAdmin.xhtml?faces-redirect=true";
-            } else {
-                return "/EspaceUser/dashboardUser.xhtml?faces-redirect=true";
-            }
-        } else {
+        // 2. On appelle la logique de décision
+        String redirection = determinerRedirection(utilisateurConnecter);
+
+        // 3. La partie qui a besoin du Serveur (FacesContext)
+        if (redirection == null) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Erreur", "Email ou mot de passe incorrect"));
+        }
+
+        return redirection;
+    }
+
+    // ✅ MÉTHODE À TESTER : Elle est "pure" (pas de BDD, pas de Serveur)
+    public String determinerRedirection(Utilisateur u) {
+        if (u == null)
             return null;
+
+        if (u.getRole() == Role.Admin) {
+            return "/EspaceAdmin/dashboardAdmin.xhtml?faces-redirect=true";
+        } else {
+            return "/dashboardUser.xhtml?faces-redirect=true";
         }
     }
 
@@ -65,11 +75,6 @@ public class AuthBean implements Serializable {
         newUser.setPassword(user.getPassword());
         newUser.setGenre(user.getGenre());
         newUser.setVille(user.getVille());
-        if ("admin@nourelhouda.com".equals(user.getEmail())) {
-            newUser.setRole(Role.Admin);
-        } else {
-            newUser.setRole(Role.User);
-        }
 
         // Auto-detect country from city via Nominatim
         String pays = cityCountryService.getCountry(user.getVille());
@@ -90,6 +95,7 @@ public class AuthBean implements Serializable {
             return null;
         }
     }
+
     public String Deconnecter() {
         // ✅ Invalider la session pour vider le bean
         FacesContext.getCurrentInstance()
@@ -97,5 +103,4 @@ public class AuthBean implements Serializable {
                 .invalidateSession();
         return "/Auth/login.xhtml?faces-redirect=true";
     }
-
 }
