@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nour El Houda - Inscription</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Lato:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            min-height: 100vh;
+            background: #1b3d2b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Lato', sans-serif;
+            padding: 20px;
+        }
+        .card {
+            background: #f5f0e6;
+            border-radius: 22px;
+            padding: 36px 32px 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.45);
+            animation: fadeUp 0.4s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(18px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .logo-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 26px;
+            gap: 5px;
+        }
+        .logo-circle {
+            width: 62px; height: 62px;
+            background: #1b3d2b;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+        .logo-arabic {
+            font-family: 'Amiri', serif;
+            font-size: 24px;
+            color: #1b3d2b;
+            direction: rtl;
+        }
+        .logo-latin {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #2d7a50;
+            font-weight: 700;
+        }
+        .logo-subtitle {
+            font-size: 12px;
+            color: #8a9a8a;
+            font-style: italic;
+        }
+        .tabs {
+            display: flex;
+            background: #e6dfd0;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 26px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Lato', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: #8a9a8a;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+        }
+        .tab-btn.active {
+            background: #1b3d2b;
+            color: #f5f0e6;
+        }
+        .field { margin-bottom: 16px; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #4a5a4a;
+            margin-bottom: 7px;
+        }
+        .inp {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1.5px solid #ddd5c5;
+            border-radius: 10px;
+            font-family: 'Lato', sans-serif;
+            font-size: 14px;
+            color: #2a3a2a;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+            appearance: none;
+        }
+        .inp:focus { border-color: #2d7a50; }
+        .inp::placeholder { color: #c0c8c0; }
+        .genre-group { display: flex; gap: 10px; }
+        .genre-opt { flex: 1; }
+        .genre-opt input[type="radio"] { display: none; }
+        .genre-opt label {
+            display: block;
+            padding: 11px;
+            border: 1.5px solid #ddd5c5;
+            border-radius: 10px;
+            background: #fff;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5a4a;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .genre-opt input[type="radio"]:checked + label {
+            border-color: #2d7a50;
+            background: #edf5f0;
+            color: #1b3d2b;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #1b3d2b;
+            color: #f5f0e6;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Lato', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #2d7a50; }
+        .msg-error {
+            background: #fdecea;
+            border: 1px solid #f5c6c6;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #c0392b;
+            margin-bottom: 14px;
+            display: block;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="card">
+        <div class="logo-wrap">
+            <div class="logo-circle">🌙</div>
+            <div class="logo-arabic">نور الهدى</div>
+            <div class="logo-latin">NOUR EL HOUDA</div>
+            <div class="logo-subtitle">"La Lumière du Chemin Droit"</div>
+        </div>
+
+        <div class="tabs">
+            <h:outputLink value="login.xhtml" styleClass="tab-btn">Connexion</h:outputLink>
+            <span class="tab-btn active">Inscription</span>
+        </div>
+
+        <h:form id="formRegister">
+            <h:messages globalOnly="true" styleClass="msg-error"
+                        showSummary="true" showDetail="true"/>
+
+            <div class="field">
+                <label>Nom </label>
+                <h:inputText value="#{authBean.user.nom}"
+                             styleClass="inp"
+                             pt:placeholder="Ex: Jdia"
+                             required="true"/>
+            </div>
+            <div class="field">
+                <label>Prenom </label>
+                <h:inputText value="#{authBean.user.prenom}"
+                             styleClass="inp"
+                             pt:placeholder="Ex: Somia"
+                             required="true"/>
+            </div>
+
+
+            <div class="field">
+                <label>Email</label>
+                <h:inputText value="#{authBean.user.email}"
+                             styleClass="inp"
+                             pt:placeholder="votre@email.com"
+                             required="true"/>
+            </div>
+
+            <div class="field">
+                <label>Mot de passe</label>
+                <h:inputSecret value="#{authBean.user.password}"
+                               styleClass="inp"
+                               pt:placeholder="Min. 6 caractères"
+                               required="true"/>
+            </div>
+
+            <div class="field">
+                <label>Ville</label>
+                <select id="villeSelect" class="inp" onchange="handleVilleChange()">
+                    <option value="">Choisir une ville...</option>
+                    <option value="Casablanca">Casablanca</option>
+                    <option value="Rabat">Rabat</option>
+                    <option value="Marrakech">Marrakech</option>
+                    <option value="Fès">Fès</option>
+                    <option value="Tanger">Tanger</option>
+                    <option value="Agadir">Agadir</option>
+                    <option value="Oujda">Oujda</option>
+                    <option value="Meknès">Meknès</option>
+                    <option value="Autre">Autre...</option>
+                </select>
+
+                <h:inputText id="villeInput" value="#{authBean.user.ville}"
+                             styleClass="inp" style="display:none; margin-top: 10px;"
+                             pt:placeholder="Tapez le nom de votre ville..."
+                             required="true"/>
+            </div>
+
+            <div class="field">
+                <label>Genre</label>
+                <div class="genre-group">
+                    <div class="genre-opt">
+                        <input type="radio" id="g-homme" name="genreRadio"
+                               onclick="setGenre('Homme')"/>
+                        <label for="g-homme">🧔 Homme</label>
+                    </div>
+                    <div class="genre-opt">
+                        <input type="radio" id="g-femme" name="genreRadio"
+                               onclick="setGenre('Femme')"/>
+                        <label for="g-femme">🧕 Femme</label>
+                    </div>
+                </div>
+                <h:inputHidden id="genreHidden" value="#{authBean.user.genre}"/>
+            </div>
+
+            <h:commandButton value="Créer mon compte ✨"
+                             styleClass="btn-submit"
+                             action="#{authBean.Inscrire}"/>
+        </h:form>
+    </div>
+
+    <script>
+        function setGenre(val) {
+            var hidden = document.querySelector('[id$="genreHidden"]');
+            if (hidden) hidden.value = val;
+        }
+
+        function handleVilleChange() {
+            var select = document.getElementById("villeSelect");
+            // Les IDs JSF sont prefixés par le form, donc "formRegister:villeInput"
+            var input = document.getElementById("formRegister:villeInput");
+            
+            if (select.value === "Autre") {
+                input.style.display = "block";
+                input.value = ""; // Vider pour forcer la saisie manuelle
+                input.focus();
+            } else {
+                input.style.display = "none";
+                input.value = select.value; // Transférer la valeur de la liste dans le champ input JSF caché
+            }
+        }
+    </script>
+</h:body>
+</html>

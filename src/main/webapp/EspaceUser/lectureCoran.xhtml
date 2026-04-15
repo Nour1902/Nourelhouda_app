@@ -1,0 +1,268 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .quran-container {
+                background: #fff;
+                border-radius: 24px;
+                padding: 40px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+                position: relative;
+                min-height: 80vh;
+            }
+
+            .header-quran {
+                text-align: center;
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .header-quran h1 {
+                font-family: 'Amiri', serif;
+                color: #103422;
+                font-size: 36px;
+                margin-bottom: 5px;
+            }
+
+            .surah-selector-wrapper {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 30px;
+                gap: 15px;
+            }
+
+            .surah-select {
+                padding: 12px 20px;
+                border-radius: 12px;
+                border: 2px solid #e0dfd5;
+                font-size: 16px;
+                font-family: 'Lato', sans-serif;
+                background: #fbfbf9;
+                color: #333;
+                width: 300px;
+                outline: none;
+                transition: border-color 0.3s;
+            }
+
+            .surah-select:focus {
+                border-color: #103422;
+            }
+
+            .btn-load {
+                background: #103422;
+                color: #fff;
+                font-weight: 600;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 12px;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+            .btn-load:hover {
+                background: #1a5235;
+            }
+
+            .bismillah {
+                font-family: 'Amiri', serif;
+                font-size: 32px;
+                text-align: center;
+                margin-bottom: 40px;
+                color: #103422;
+            }
+
+            .reading-area {
+                font-family: 'Amiri', serif;
+                font-size: 34px;
+                line-height: 2.2;
+                direction: rtl;
+                text-align: justify;
+                color: #222;
+                padding: 0 20px;
+            }
+
+            .verse-number {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                width: 40px;
+                height: 40px;
+                background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 5 L85 25 L85 75 L50 95 L15 75 L15 25 Z" fill="none" stroke="%23cba358" stroke-width="3"/></svg>');
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                font-size: 16px;
+                font-weight: bold;
+                color: #cba358;
+                margin: 0 10px;
+                vertical-align: middle;
+            }
+
+            .loader {
+                text-align: center;
+                font-size: 20px;
+                color: #777;
+                display: none;
+                padding: 50px 0;
+            }
+
+            .completion-card {
+                background: #f0ebe0;
+                border-radius: 16px;
+                padding: 30px;
+                text-align: center;
+                margin-top: 50px;
+                border: 2px dashed #d0c8b0;
+                display: none; /* revealed when a surah is loaded */
+            }
+
+            .completion-card h3 {
+                color: #103422;
+                margin-bottom: 15px;
+            }
+
+            .record-btn {
+                display: inline-block;
+                background: #cba358;
+                color: #fff;
+                text-decoration: none;
+                padding: 12px 30px;
+                border-radius: 30px;
+                font-weight: 700;
+                margin-top: 10px;
+                transition: 0.3s;
+            }
+            .record-btn:hover {
+                background: #b5904c;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="quran-container">
+            
+            <div class="header-quran">
+                <h1>القرآن الكريم</h1>
+                <p>Lecture du Saint Coran</p>
+            </div>
+
+            <div class="surah-selector-wrapper">
+                <select id="surahSelect" class="surah-select">
+                    <option value="">-- Choisir une Sourate --</option>
+                    <!-- Populated via JS -->
+                </select>
+                <button class="btn-load" onclick="loadSurah()">Lire</button>
+            </div>
+
+            <div class="loader" id="loader">Chargement des versets... ⏳</div>
+
+            <div id="quranArea" style="display: none;">
+                <div class="bismillah" id="bismillahContainer">
+                    بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+                </div>
+                <div class="reading-area" id="readingArea">
+                    <!-- Verses will go here -->
+                </div>
+                
+                <div class="completion-card" id="completionCard">
+                    <h3>✅ Masha'Allah, vous avez lu <span id="verseCountDisplay">0</span> versets !</h3>
+                    <p>N'oubliez pas d'enregistrer cette adoration pour mettre à jour votre score du jour.</p>
+                    <a href="suivi.xhtml" class="record-btn">Enregistrer dans mon Suivi 📋</a>
+                </div>
+            </div>
+            
+        </div>
+
+        <script type="text/javascript">
+        //<![CDATA[
+            
+            let surahsMeta = [];
+            let currentVerseCount = 0;
+
+            // Fetch list of Surahs on load
+            window.onload = function() {
+                fetch('https://api.alquran.cloud/v1/surah')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('surahSelect');
+                    const surahs = data.data; // Array of 114 surahs
+                    surahsMeta = surahs;
+                    
+                    surahs.forEach(surah => {
+                        let option = document.createElement('option');
+                        option.value = surah.number;
+                        // Avoid JSF EL syntax and use string concatenation
+                        option.text = surah.number + '. ' + surah.englishName + ' (' + surah.name + ')';
+                        select.appendChild(option);
+                    });
+                })
+                .catch(err => console.error("Erreur chargement sourates:", err));
+            };
+
+            function loadSurah() {
+                const surahNum = document.getElementById('surahSelect').value;
+                if(!surahNum) return;
+
+                const quranArea = document.getElementById('quranArea');
+                const readingArea = document.getElementById('readingArea');
+                const loader = document.getElementById('loader');
+                const bism = document.getElementById('bismillahContainer');
+                const card = document.getElementById('completionCard');
+
+                quranArea.style.display = 'none';
+                loader.style.display = 'block';
+
+                // Avoid JSF EL syntax
+                fetch('https://api.alquran.cloud/v1/surah/' + surahNum)
+                .then(response => response.json())
+                .then(data => {
+                    loader.style.display = 'none';
+                    readingArea.innerHTML = '';
+                    
+                    const verses = data.data.ayahs;
+                    currentVerseCount = verses.length;
+                    
+                    if(surahNum == 9) {
+                        bism.style.display = 'none';
+                    } else {
+                        bism.style.display = 'block';
+                    }
+
+                    // Format verses
+                    let htmlContent = '';
+                    verses.forEach(ayah => {
+                        let text = ayah.text;
+                        if (surahNum != 1 && ayah.numberInSurah === 1 && text.startsWith("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ")) {
+                            text = text.replace("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", "").trim();
+                        }
+                        
+                        // Avoid JSF EL syntax
+                        htmlContent += text + ' <span class="verse-number">' + ayah.numberInSurah + '</span> ';
+                    });
+
+                    readingArea.innerHTML = htmlContent;
+                    document.getElementById('verseCountDisplay').innerText = currentVerseCount;
+                    
+                    quranArea.style.display = 'block';
+                    card.style.display = 'block';
+                    
+                    window.scrollTo({
+                        top: document.querySelector('.header-quran').offsetHeight + 50,
+                        behavior: 'smooth'
+                    });
+                })
+                .catch(err => {
+                    loader.style.display = 'none';
+                    alert("Erreur de réseau. Veuillez réessayer.");
+                    console.error(err);
+                });
+            }
+
+        //]]>
+        </script>
+    </ui:define>
+</ui:composition>

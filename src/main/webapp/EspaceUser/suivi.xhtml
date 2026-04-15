@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .suivi-header {
+                background: #143e2a; 
+                color: #fff;
+                border-radius: 20px;
+                padding: 24px;
+                text-align: center;
+                margin-bottom: 24px;
+                box-shadow: 0 8px 20px rgba(20,62,42,0.15);
+            }
+            .suivi-header h2 { font-size: 16px; letter-spacing: 2px; color: #d1b464; margin-bottom: 8px; text-transform: uppercase; font-family: 'Amiri', serif;}
+            .suivi-header .date { font-size: 13px; color: #a8d5b8; margin-bottom: 12px; font-weight: 500;}
+            .suivi-header .score { font-size: 46px; font-weight: 700; color: #d1b464; line-height: 1; margin-bottom: 4px; }
+            .suivi-header .score-desc { font-size: 12px; color: #a8d5b8; }
+
+            .act-list {
+                background: #fff;
+                border-radius: 20px;
+                padding: 20px 24px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+                margin-bottom: 20px;
+            }
+            
+            .section-title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid #f0ebe0;
+                padding-bottom: 15px;
+                margin-bottom: 15px;
+            }
+            .section-title-left { font-size: 14px; font-weight: 700; color: #103422; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+            .section-title-right { font-family: 'Amiri', serif; font-size: 18px; color: #444; }
+
+            .act-item {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+                margin-bottom: 8px;
+                border-radius: 12px;
+                transition: background 0.3s;
+            }
+            .act-item:last-child { margin-bottom: 0; }
+            .act-item.checked-row {
+                background: #f0f7f3;
+            }
+            
+            .act-checkbox {
+                width: 26px; height: 26px;
+                border-radius: 6px;
+                border: 2px solid #e0dfd5;
+                margin-right: 16px;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer;
+                background: #fff;
+                transition: 0.2s;
+                text-decoration: none;
+            }
+            .act-checkbox.checked {
+                background: #2d7a50;
+                border-color: #2d7a50;
+                color: #fff;
+            }
+            .act-checkbox:hover {
+                text-decoration: none;
+            }
+            
+            .act-name { flex: 1; font-size: 15px; font-weight: 600; color: #222; }
+            
+            .act-pts {
+                padding: 6px 12px;
+                border-radius: 16px;
+                font-size: 12px;
+                font-weight: 700;
+                transition: 0.3s;
+            }
+            .act-pts.unchecked {
+                background: #f3ecdb;
+                color: #8c764b;
+            }
+            .act-pts.checked {
+                background: #2d7a50;
+                color: #fff;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="suiviForm">
+        <div class="suivi-header">
+            <h2>Tableau de Suivi</h2>
+            <div class="date"><h:outputText value="#{userSuiviBean.formattedDate}" style="text-transform: capitalize;"/> — #{userDashboardBean.hijriDay} #{userDashboardBean.hijriMonthAr}</div>
+            <div class="score">#{userSuiviBean.scoreActuel} pts</div>
+            <div class="score-desc">sur #{userSuiviBean.scoreMax} points maximum</div>
+        </div>
+
+        <ui:fragment rendered="#{not empty userSuiviBean.adorations}">
+            <div class="act-list">
+                <div class="section-title">
+                    <div class="section-title-left"><span>🕌</span> ADORATIONS</div>
+                    <div class="section-title-right">العبادات</div>
+                </div>
+                
+                <ui:repeat value="#{userSuiviBean.adorations}" var="acte">
+                    <div class="act-item #{userSuiviBean.isFait(acte.id) ? 'checked-row' : ''}">
+                        <h:commandLink action="#{userSuiviBean.toggleAction(acte.id)}" styleClass="act-checkbox #{userSuiviBean.isFait(acte.id) ? 'checked' : ''}">
+                            <f:ajax render="@form" />
+                            <h:outputText value="✓" rendered="#{userSuiviBean.isFait(acte.id)}" />
+                        </h:commandLink>
+                        
+                        <div class="act-name">#{acte.nom}</div>
+                        <div class="act-pts #{userSuiviBean.isFait(acte.id) ? 'checked' : 'unchecked'}">#{acte.points} pts</div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{not empty userSuiviBean.prieres}">
+            <div class="act-list">
+                <div class="section-title">
+                    <div class="section-title-left"><span>🤲</span> LA PRIÈRE</div>
+                    <div class="section-title-right">الصلاة</div>
+                </div>
+                
+                <ui:repeat value="#{userSuiviBean.prieres}" var="acte">
+                    <div class="act-item #{userSuiviBean.isFait(acte.id) ? 'checked-row' : ''}">
+                        <h:commandLink action="#{userSuiviBean.toggleAction(acte.id)}" styleClass="act-checkbox #{userSuiviBean.isFait(acte.id) ? 'checked' : ''}">
+                            <f:ajax render="@form" />
+                            <h:outputText value="✓" rendered="#{userSuiviBean.isFait(acte.id)}" />
+                        </h:commandLink>
+                        
+                        <div class="act-name">#{acte.nom}</div>
+                        <div class="act-pts #{userSuiviBean.isFait(acte.id) ? 'checked' : 'unchecked'}">#{acte.points} pts</div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </ui:fragment>
+        
+        <ui:fragment rendered="#{not empty userSuiviBean.dhikrs}">
+            <div class="act-list">
+                <div class="section-title">
+                    <div class="section-title-left"><span>📿</span> LES DHIKR</div>
+                    <div class="section-title-right">الأذكار</div>
+                </div>
+                
+                <ui:repeat value="#{userSuiviBean.dhikrs}" var="acte">
+                    <div class="act-item #{userSuiviBean.isFait(acte.id) ? 'checked-row' : ''}">
+                        <h:commandLink action="#{userSuiviBean.toggleAction(acte.id)}" styleClass="act-checkbox #{userSuiviBean.isFait(acte.id) ? 'checked' : ''}">
+                            <f:ajax render="@form" />
+                            <h:outputText value="✓" rendered="#{userSuiviBean.isFait(acte.id)}" />
+                        </h:commandLink>
+                        
+                        <div class="act-name">#{acte.nom}</div>
+                        <div class="act-pts #{userSuiviBean.isFait(acte.id) ? 'checked' : 'unchecked'}">#{acte.points} pts</div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{not empty userSuiviBean.nuits}">
+            <div class="act-list">
+                <div class="section-title">
+                    <div class="section-title-left"><span>🌙</span> LA NUIT (Qiyam)</div>
+                    <div class="section-title-right">قيام الليل</div>
+                </div>
+                
+                <ui:repeat value="#{userSuiviBean.nuits}" var="acte">
+                    <div class="act-item #{userSuiviBean.isFait(acte.id) ? 'checked-row' : ''}">
+                        <h:commandLink action="#{userSuiviBean.toggleAction(acte.id)}" styleClass="act-checkbox #{userSuiviBean.isFait(acte.id) ? 'checked' : ''}">
+                            <f:ajax render="@form" />
+                            <h:outputText value="✓" rendered="#{userSuiviBean.isFait(acte.id)}" />
+                        </h:commandLink>
+                        
+                        <div class="act-name">#{acte.nom}</div>
+                        <div class="act-pts #{userSuiviBean.isFait(acte.id) ? 'checked' : 'unchecked'}">#{acte.points} pts</div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </ui:fragment>
+
+
+        </h:form>
+    </ui:define>
+</ui:composition>

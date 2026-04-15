@@ -1,0 +1,22 @@
+# Maven
+target/
+*.class
+*.war
+*.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# WildFly deployments
+*.ear
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

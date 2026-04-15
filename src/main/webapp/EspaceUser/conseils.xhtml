@@ -1,0 +1,238 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets" template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-header {
+                margin-bottom: 24px;
+                padding: 16px 20px;
+                background: linear-gradient(135deg, #103422 0%, #1a5135 100%);
+                border-radius: 16px;
+                color: #fff;
+                box-shadow: 0 4px 15px rgba(16, 52, 34, 0.15);
+            }
+
+            .page-header h2 {
+                margin: 0 0 8px 0;
+                font-size: 18px;
+            }
+
+            .page-header p {
+                margin: 0;
+                font-size: 13px;
+                opacity: 0.9;
+            }
+
+            .filter-container {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+            .filter-btn {
+                background: #fff;
+                border: 1px solid #e0e0e0;
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #555;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .filter-btn:hover {
+                border-color: #103422;
+                color: #103422;
+            }
+
+            .filter-btn.active {
+                background: #103422;
+                color: white;
+                border-color: #103422;
+            }
+
+            .conseil-card {
+                background: #fff;
+                border-radius: 16px;
+                padding: 16px 20px;
+                margin-bottom: 16px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+                border-left: 4px solid #103422;
+                transition: opacity 0.3s ease;
+            }
+
+            .conseil-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 8px;
+            }
+
+            .conseil-title {
+                font-size: 14px;
+                font-weight: 700;
+                color: #103422;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex: 1;
+            }
+
+            .conseil-tag {
+                font-size: 10px;
+                font-weight: 700;
+                padding: 4px 10px;
+                border-radius: 12px;
+                color: #555;
+                background: #e6e6e6;
+                /* Fallback */
+            }
+
+            .conseil-text {
+                font-size: 13px;
+                color: #5a5a5a;
+                line-height: 1.5;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <div class="page-header">
+            <h2>💡 Vos Conseils Quotidiens</h2>
+        </div>
+
+        <div class="filter-container" id="filterContainer">
+            <button class="filter-btn active" data-filter="all">Tous</button>
+            <!-- Generated dynamically by JS -->
+        </div>
+
+        <ui:fragment rendered="#{empty userConseilFemmeBean.allConseilsValides}">
+            <!-- Mockup data in case db is empty -->
+            <div class="conseil-card" data-category="NUTRITION" style="border-left-color: #cba358;">
+                <div class="conseil-header">
+                    <div class="conseil-title"><span>🍴</span> Dattes à l'Iftar</div>
+                    <div class="conseil-tag" style="background:#e5dfcf;">Nutrition</div>
+                </div>
+                <div class="conseil-text">Rompez le jeûne avec des dattes et de l'eau pour une énergie rapide.</div>
+            </div>
+
+            <div class="conseil-card" data-category="NUTRITION" style="border-left-color: #cba358;">
+                <div class="conseil-header">
+                    <div class="conseil-title"><span>💧</span> Hydratation optimale</div>
+                    <div class="conseil-tag" style="background:#e5dfcf;">Nutrition</div>
+                </div>
+                <div class="conseil-text">Buvez 8 verres d'eau entre Iftar et Imsak. Évitez les sodas.</div>
+            </div>
+
+            <ui:fragment rendered="#{authBean.user.genre eq 'Femme' and userConseilFemmeBean.enPeriodeRegles}">
+                <div class="conseil-card" data-category="FEMME" style="border-left-color: #ea9cb0;">
+                    <div class="conseil-header">
+                        <div class="conseil-title"><span>🌸</span> Restez connectée à Allah</div>
+                        <div class="conseil-tag" style="background:#f8c8d4; color:#8c283d;">Femme</div>
+                    </div>
+                    <div class="conseil-text">Durant vos règles, vous pouvez faire du Dhikr, de la Dua, écouter le Coran
+                        et donner la Sadaqa.</div>
+                </div>
+
+                <div class="conseil-card" data-category="FEMME" style="border-left-color: #ea9cb0;">
+                    <div class="conseil-header">
+                        <div class="conseil-title"><span>💪</span> Ne vous découragez pas</div>
+                        <div class="conseil-tag" style="background:#f8c8d4; color:#8c283d;">Femme</div>
+                    </div>
+                    <div class="conseil-text">La patience durant cette période est elle-même une adoration. Allah vous
+                        récompense pour votre acceptation.</div>
+                </div>
+            </ui:fragment>
+
+            <ui:fragment rendered="#{authBean.user.genre eq 'Homme'}">
+                <div class="conseil-card" data-category="HOMME" style="border-left-color: #4a90d9;">
+                    <div class="conseil-header">
+                        <div class="conseil-title"><span>🕌</span> Prière en congrégation</div>
+                        <div class="conseil-tag" style="background:#e8f0fb; color:#4a90d9;">Homme</div>
+                    </div>
+                    <div class="conseil-text">Privilégiez la prière à la mosquée, surtout le Fajr et l'Isha, sa
+                        récompense est décuplée.</div>
+                </div>
+            </ui:fragment>
+
+            <div class="conseil-card" data-category="SPIRITUEL" style="border-left-color: #103422;">
+                <div class="conseil-header">
+                    <div class="conseil-title"><span>📖</span> Lire 1 Juz par jour</div>
+                    <div class="conseil-tag" style="background:#dcefe3; color:#103422;">Spirituel</div>
+                </div>
+                <div class="conseil-text">Terminez le Coran en 30 jours en lisant un Juz quotidiennement.</div>
+            </div>
+        </ui:fragment>
+
+        <ui:repeat value="#{userConseilFemmeBean.allConseilsValides}" var="conseil">
+            <div class="conseil-card" data-category="#{conseil.categorie}"
+                style="border-left-color: #{userConseilFemmeBean.getBadgeColor(conseil.categorie)};">
+                <div class="conseil-header">
+                    <div class="conseil-title">✨ #{conseil.titre}</div>
+                    <div class="conseil-tag"
+                        style="background:#{userConseilFemmeBean.getBadgeColor(conseil.categorie)};">
+                        #{conseil.categorie}
+                    </div>
+                </div>
+                <div class="conseil-text">#{conseil.contenu}</div>
+            </div>
+        </ui:repeat>
+
+        <script type="text/javascript">
+            //<![CDATA[
+            document.addEventListener("DOMContentLoaded", function () {
+                const cards = document.querySelectorAll('.conseil-card');
+                const filterContainer = document.getElementById('filterContainer');
+
+                // Extract unique categories from rendered cards
+                const categories = new Set();
+                cards.forEach(card => {
+                    const cat = card.getAttribute('data-category');
+                    if (cat) categories.add(cat.toUpperCase());
+                });
+
+                // Create buttons dynamically based on available categories
+                categories.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = 'filter-btn';
+                    btn.setAttribute('data-filter', cat);
+                    // Formatting category name: e.g. "SPIRITUEL" -> "Spirituel"
+                    btn.innerText = cat.charAt(0) + cat.slice(1).toLowerCase();
+
+                    btn.addEventListener('click', function () {
+                        // Remove active class from all
+                        filterContainer.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+
+                        // Show only matching cards
+                        cards.forEach(card => {
+                            if (card.getAttribute('data-category').toUpperCase() === cat) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    });
+
+                    filterContainer.appendChild(btn);
+                });
+
+                // Active state logic for "Tous"
+                const btnAll = filterContainer.querySelector('[data-filter="all"]');
+                btnAll.addEventListener('click', function () {
+                    filterContainer.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btnAll.classList.add('active');
+                    cards.forEach(card => {
+                        card.style.display = 'block';
+                    });
+                });
+            });
+            //]]>
+        </script>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Nour El Houda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Lato:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #f5f1e7;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            background: #f5f1e7;
+        }
+
+        /* SIDEBAR (Desktop) */
+        .sidebar {
+            background: #103422;
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s;
+            z-index: 100;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar.femme-theme {
+            background: #aa3d53;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            color: #d8c281;
+            font-family: 'Amiri', serif;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+        }
+
+        .nav-items-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .nav-items-container::-webkit-scrollbar { display: none; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            color: #7a9c8a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            gap: 16px;
+            transition: 0.2s;
+            border-left: 4px solid transparent;
+        }
+        .nav-item .icon { font-size: 20px; }
+        .nav-item:hover { color: #c5dfce; background: rgba(255,255,255,0.05); }
+        .nav-item.active { color: #fceea7; background: rgba(255,255,255,0.1); border-left: 4px solid #fceea7; }
+        
+        .nav-item.femme:hover { color: #ff9fb2; }
+        .nav-item.femme.active { color: #ff9fb2; border-left: 4px solid #ff9fb2; }
+
+        /* MAIN CONTENT AREA */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f5f1e7;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .top-bar {
+            background: #fff;
+            padding: 16px 36px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+            z-index: 10;
+            height: 70px;
+        }
+
+        .top-bar.femme-theme {
+            background-color: #aa3d53;
+        }
+
+        .mobile-logo { display: none; }
+
+        .profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #103422;
+            background: #f5f1e7;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+        .profile-badge .avatar {
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 36px;
+            overflow-y: auto;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .main-content::-webkit-scrollbar { width: 6px; }
+        .main-content::-webkit-scrollbar-thumb { background: #d8cfbc; border-radius: 3px; }
+
+        /* MOBILE RESPONSIVE OVERRIDES */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            
+            .sidebar { 
+                position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 75px;
+                flex-direction: row; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+                border-top-left-radius: 20px; border-top-right-radius: 20px;
+                padding-bottom: env(safe-area-inset-bottom); /* iOS support */
+            }
+            .sidebar-header { display: none; }
+            
+            .nav-items-container {
+                flex-direction: row;
+                justify-content: space-around;
+                width: 100%;
+                align-items: center;
+            }
+
+            .nav-item { 
+                flex-direction: column; padding: 10px 0; font-size: 11px; gap: 4px; border-left: none !important; flex:1; justify-content:center; 
+                border-bottom: 3px solid transparent; border-top: 3px solid transparent;
+            }
+            .nav-item .icon { font-size: 22px; margin-bottom: 2px;}
+            .nav-item.active { border-bottom: none; border-top: 3px solid #fceea7; background: transparent; }
+            .nav-item.femme.active { border-bottom: none; border-top: 3px solid #ff9fb2; }
+
+            .top-bar { 
+                justify-content: space-between; padding: 16px 20px; 
+                background: #103422; color: #fff;
+                border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+                height: auto;
+            }
+            .top-bar.femme-theme { background: #aa3d53; }
+            
+            .mobile-logo { 
+                display: flex; align-items: center; gap: 8px; font-family: 'Amiri', serif; font-size: 18px; color: #d8c281;
+            }
+            
+            .profile-badge { background: rgba(255,255,255,0.15); color: #fff; }
+
+            .main-content { padding: 20px; padding-bottom: 100px; }
+        }
+
+        /* Profile wrap at sidebar bottom */
+        .profile-wrap {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+        .profile-wrap-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+        .profile-wrap-btn:hover { background: rgba(255,255,255,0.08); }
+        .profile-wrap-avatar {
+            width: 36px; height: 36px;
+            background: #2d7a50;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .profile-wrap-info .pw-name {
+            font-size: 13px; font-weight: 700; color: #f5f0e6;
+        }
+        .profile-wrap-info .pw-role {
+            font-size: 10px; color: #ffd700; font-weight: 600;
+        }
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            bottom: 75px; left: 16px; right: 16px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            overflow: hidden;
+            z-index: 200;
+        }
+        .profile-wrap:hover .profile-dropdown { display: block; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2a3a2a;
+            text-decoration: none;
+            transition: background 0.2s;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-family: 'Lato', sans-serif;
+        }
+        .dropdown-item:hover { background: #f0ebe0; }
+        .dropdown-item.logout { color: #c0392b; border-top: 1px solid #f0ebe0; }
+        @media (max-width: 768px) {
+            .profile-wrap { display: none; }
+        }
+
+        /* Common Utility Classes needed for the pages */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+        @media (max-width: 768px) {
+            .card { padding: 16px; margin-bottom: 16px; }
+        }
+    </style>
+    <ui:insert name="styles"/>
+</h:head>
+
+<h:body>
+    <div class="app-container">
+        
+        <!-- Sidebar -->
+        <h:panelGroup layout="block" styleClass="sidebar #{view.viewId.contains('femme.xhtml') ? 'femme-theme' : ''}">
+            <div class="sidebar-header">
+                <span class="icon">
+                    <h:outputText value="#{view.viewId.contains('femme.xhtml') ? '🌸' : '🌙'}" />
+                </span>
+                <h:outputText value="#{view.viewId.contains('femme.xhtml') ? 'Espace Femme' : 'Nour El Houda'}" />
+            </div>
+            
+            <div class="nav-items-container">
+                <a href="dashboardUser.xhtml" class="nav-item #{view.viewId.contains('dashboardUser.xhtml') ? 'active' : ''}">
+                    <span class="icon">🏠</span>
+                    <span>Accueil</span>
+                </a>
+                <a href="suivi.xhtml" class="nav-item #{view.viewId.contains('suivi.xhtml') ? 'active' : ''}">
+                    <span class="icon">📋</span>
+                    <span>Suivi</span>
+                </a>
+                <a href="statistiques.xhtml" class="nav-item #{view.viewId.contains('statistiques.xhtml') ? 'active' : ''}">
+                    <span class="icon">📊</span>
+                    <span>Stats</span>
+                </a>
+                <a href="horaires.xhtml" class="nav-item #{view.viewId.contains('horaires.xhtml') ? 'active' : ''}">
+                    <span class="icon">🕌</span>
+                    <span>Prières</span>
+                </a>
+                
+                <h:panelGroup rendered="#{authBean.user.genre eq 'Femme'}">
+                    <a href="femme.xhtml" class="nav-item femme #{view.viewId.contains('femme.xhtml') ? 'active' : ''}">
+                        <span class="icon">🌸</span>
+                        <span>Femme</span>
+                    </a>
+                </h:panelGroup>
+                <a href="qibla.xhtml" class="nav-item #{view.viewId.contains('qibla.xhtml') ? 'active' : ''}">
+                    <span class="icon">🧭</span>
+                    <span>Qibla</span>
+                </a>
+
+                <a href="lectureCoran.xhtml" class="nav-item #{view.viewId.contains('lectureCoran.xhtml') ? 'active' : ''}">
+                    <span class="icon">📖</span>
+                    <span>Coran</span>
+                </a>
+
+                <a href="compteurDhikr.xhtml" class="nav-item #{view.viewId.contains('compteurDhikr.xhtml') ? 'active' : ''}">
+                    <span class="icon">📿</span>
+                    <span>Dhikr</span>
+                </a>
+
+                <a href="conseils.xhtml" class="nav-item #{view.viewId.contains('conseils.xhtml') ? 'active' : ''}">
+                    <span class="icon">💡</span>
+                    <span>Conseils</span>
+                </a>
+            </div>
+
+            <!-- Profile + Déconnexion (same as admin) -->
+            <div class="profile-wrap">
+                <div class="profile-wrap-btn">
+                    <div class="profile-wrap-avatar">
+                        <h:outputText value="#{authBean.user.genre eq 'Femme' ? '🧕' : '🧔'}"/>
+                    </div>
+                    <div class="profile-wrap-info">
+                        <div class="pw-name"><h:outputText value="#{authBean.user.prenom}"/></div>
+                        <div class="pw-role">Utilisateur</div>
+                    </div>
+                </div>
+                <div class="profile-dropdown">
+                    <a href="profilUser.xhtml" class="dropdown-item">👤 Mon Profil</a>
+                    <h:form style="margin:0;">
+                        <h:commandButton value="🚪 Déconnexion"
+                                         styleClass="dropdown-item logout"
+                                         action="#{authBean.Deconnecter}"/>
+                    </h:form>
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <!-- Main Wrapper (Top bar + Content) -->
+        <div class="main-wrapper">
+            <!-- Top Bar -->
+            <h:panelGroup layout="block" styleClass="top-bar #{view.viewId.contains('femme.xhtml') ? 'femme-theme' : ''}">
+                <div class="mobile-logo">
+                    <span class="icon">
+                        <h:outputText value="#{view.viewId.contains('femme.xhtml') ? '🌸' : '🌙'}" />
+                    </span>
+                    <h:outputText value="#{view.viewId.contains('femme.xhtml') ? 'Espace Femme' : 'Nour'}" />
+                </div>
+                <a href="profilUser.xhtml" class="header-profile" style="text-decoration:none; color:inherit;">
+                <div class="avatar">
+                    <h:outputText value="#{authBean.user.genre eq 'Femme' ? '🧕' : '🧔'}" />
+                </div>
+                <h:outputText value="#{authBean.user.prenom}"/>
+            </a>
+            </h:panelGroup>
+
+            <!-- Content -->
+            <div class="main-content">
+                <ui:insert name="content"/>
+            </div>
+        </div>
+
+    </div>
+</h:body>
+</html>

@@ -1,0 +1,308 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .dhikr-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 70vh;
+                background: #fff;
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+                padding: 40px 20px;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .dhikr-container::before {
+                content: '';
+                position: absolute;
+                top: 0; left: 0; right: 0; height: 12px;
+                background: linear-gradient(90deg, #103422, #a8d5b8);
+            }
+
+            .dhikr-title {
+                font-size: 28px;
+                font-family: 'Amiri', serif;
+                color: #103422;
+                margin-bottom: 8px;
+            }
+            .dhikr-subtitle {
+                font-size: 14px;
+                color: #6a7a6a;
+                margin-bottom: 40px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+
+            .options-container {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 40px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .dhikr-option {
+                background: #f5f1e7;
+                border: 2px solid transparent;
+                padding: 10px 20px;
+                border-radius: 30px;
+                cursor: pointer;
+                font-weight: 700;
+                color: #2a3a2a;
+                font-size: 14px;
+                transition: 0.3s;
+                font-family: 'Amiri', serif;
+            }
+            .dhikr-option.active {
+                background: #e6eede;
+                border-color: #103422;
+                color: #103422;
+            }
+
+            .counter-display {
+                font-size: 80px;
+                font-weight: 700;
+                color: #103422;
+                font-variant-numeric: tabular-nums;
+                line-height: 1;
+                margin-bottom: 30px;
+                text-shadow: 0 4px 10px rgba(16, 52, 34, 0.1);
+            }
+
+            .progress-text {
+                font-size: 14px;
+                font-weight: 600;
+                color: #888;
+                margin-bottom: 10px;
+            }
+
+            .tap-button {
+                width: 180px;
+                height: 180px;
+                border-radius: 50%;
+                background: #103422;
+                color: #fff;
+                border: none;
+                font-size: 24px;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 15px 35px rgba(16, 52, 34, 0.3), inset 0 -5px 15px rgba(0,0,0,0.2);
+                transition: transform 0.1s, box-shadow 0.1s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                user-select: none;
+                position: relative;
+                overflow: hidden;
+            }
+            .tap-button:active {
+                transform: scale(0.95);
+                box-shadow: 0 5px 15px rgba(16, 52, 34, 0.3), inset 0 5px 15px rgba(0,0,0,0.3);
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 20px;
+                margin-top: 40px;
+            }
+
+            .btn-action {
+                background: #f0ebe0;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 12px;
+                color: #2a3a2a;
+                font-weight: 700;
+                font-size: 13px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: 0.2s;
+            }
+            .btn-action:hover {
+                background: #e0dbd0;
+            }
+            .btn-action.reset {
+                color: #c0392b;
+            }
+
+            /* Ripple Effect */
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.4);
+                transform: scale(0);
+                animation: ripple-anim 0.6s linear;
+                pointer-events: none;
+            }
+            @keyframes ripple-anim {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            .celebration {
+                display: none;
+                color: #2d7a50;
+                font-weight: 700;
+                font-size: 16px;
+                margin-top: -20px;
+                margin-bottom: 20px;
+                animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            @keyframes popIn {
+                0% { opacity: 0; transform: scale(0.5); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="dhikr-container">
+            <div class="dhikr-title" id="dhikrWord">سبحان الله</div>
+            <div class="dhikr-subtitle">SubhanAllah</div>
+
+            <div class="options-container">
+                <button class="dhikr-option active" onclick="setDhikr('سبحان الله', 'SubhanAllah', this)">سبحان الله</button>
+                <button class="dhikr-option" onclick="setDhikr('الحمد لله', 'Alhamdulillah', this)">الحمد لله</button>
+                <button class="dhikr-option" onclick="setDhikr('الله أكبر', 'Allahu Akbar', this)">الله أكبر</button>
+                <button class="dhikr-option" onclick="setDhikr('لا إله إلا الله', 'La ilaha illallah', this)">لا إله إلا الله</button>
+            </div>
+
+            <div class="progress-text">Objectif: <span id="goalText">33</span></div>
+            <div class="celebration" id="celebrationMsg">🎉 Objectif atteint !</div>
+            
+            <div class="counter-display" id="counterValue">0</div>
+
+            <button class="tap-button" id="tapBtn" onclick="incrementCounter(event)">
+                TAP
+            </button>
+
+            <div class="action-buttons">
+                <button class="btn-action reset" onclick="resetCounter(); return false;">
+                    <span>🔄</span> Réinitialiser
+                </button>
+                <button class="btn-action" onclick="toggleGoal(); return false;">
+                    <span>🎯</span> Changer l'objectif
+                </button>
+            </div>
+
+
+
+
+        </div>
+
+        <script type="text/javascript">
+        //<![CDATA[
+            let count = 0;
+            let goal = 33;
+
+            const counterEl = document.getElementById('counterValue');
+            const goalEl = document.getElementById('goalText');
+            const wordArEl = document.getElementById('dhikrWord');
+            const wordFrEl = document.querySelector('.dhikr-subtitle');
+            const tapBtn = document.getElementById('tapBtn');
+            const celebrationMsg = document.getElementById('celebrationMsg');
+
+            function setDhikr(wordAr, wordFr, btnElement) {
+                wordArEl.innerText = wordAr;
+                wordFrEl.innerText = wordFr;
+                
+                // Update active state
+                document.querySelectorAll('.dhikr-option').forEach(el => el.classList.remove('active'));
+                btnElement.classList.add('active');
+                
+                resetCounter();
+            }
+
+            function incrementCounter(e) {
+                // Taptic feedback if supported
+                if (navigator.vibrate) navigator.vibrate(15);
+                
+                count++;
+                counterEl.innerText = count;
+
+                // Create Ripple
+                let rect = tapBtn.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+                
+                let ripple = document.createElement('span');
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                tapBtn.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+
+                // Goal check
+                if (count === goal) {
+                    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+                    celebrationMsg.style.display = 'block';
+                    counterEl.style.color = '#2d7a50';
+                } else if (count > goal) {
+                    celebrationMsg.style.display = 'none';
+                    counterEl.style.color = '#103422';
+                }
+            }
+
+            function resetCounter() {
+                count = 0;
+                counterEl.innerText = count;
+                celebrationMsg.style.display = 'none';
+                counterEl.style.color = '#103422';
+            }
+
+            function saveDhikrAction() {
+                if(count === 0) {
+                    alert("Commencez par faire du Dhikr avant d'enregistrer !");
+                    return;
+                }
+                alert("Masha'Allah ! " + count + " Dhikrs accomplis. Cochez l'acte correspondant dans votre page Suivi pour garder votre score.");
+            }
+
+            function toggleGoal() {
+                if (goal === 33) goal = 100;
+                else if (goal === 100) goal = Infinity;
+                else goal = 33;
+                
+                goalEl.innerText = goal === Infinity ? 'Infini' : goal;
+                
+                // Re-evaluate current counter state
+                if (count >= goal && goal !== Infinity) {
+                    celebrationMsg.style.display = 'block';
+                    counterEl.style.color = '#2d7a50';
+                } else {
+                    celebrationMsg.style.display = 'none';
+                    counterEl.style.color = '#103422';
+                }
+            }
+
+            // Bind keyboard space or accessible keys
+            document.addEventListener('keydown', function(event) {
+                // Spacebar or Enter
+                if(event.code === 'Space' || event.code === 'Enter') {
+                    // prevent default scroll for space
+                    if(document.activeElement !== tapBtn) {
+                        event.preventDefault();
+                        tapBtn.click();
+                    }
+                }
+            });
+        //]]>
+        </script>
+    </ui:define>
+</ui:composition>

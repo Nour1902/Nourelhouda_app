@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/adminLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-title {
+                font-size: 22px; font-weight: 700;
+                color: #1b3d2b; margin-bottom: 24px;
+            }
+
+            /* ── STATS HORIZONTAL ── */
+            .stats-row {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+                margin-bottom: 28px;
+            }
+            .stat-card {
+                background: #fff;
+                border-radius: 16px;
+                padding: 20px 22px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+            .stat-icon-wrap {
+                width: 52px; height: 52px;
+                border-radius: 14px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 22px;
+                flex-shrink: 0;
+            }
+            .stat-icon-wrap.blue  { background: #e8f0fb; }
+            .stat-icon-wrap.green { background: #e8f5ee; }
+            .stat-icon-wrap.gold  { background: #fef9e7; }
+            .stat-icon-wrap.pink  { background: #fde8f4; }
+            .stat-info { flex: 1; }
+            .stat-label {
+                font-size: 11px; font-weight: 700;
+                letter-spacing: 1.5px; text-transform: uppercase;
+                color: #8a9a8a; margin-bottom: 4px;
+            }
+            .stat-value {
+                font-size: 28px; font-weight: 700; color: #1b3d2b;
+            }
+            .stat-sub { font-size: 11px; color: #a8b8a8; }
+            .stat-card.blue  { border-left: 4px solid #4a90d9; }
+            .stat-card.green { border-left: 4px solid #2d7a50; }
+            .stat-card.gold  { border-left: 4px solid #ffd700; }
+            .stat-card.pink  { border-left: 4px solid #e91e8c; }
+
+            /* ── CHARTS ROW ── */
+            .charts-row {
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+                gap: 20px;
+                margin-bottom: 28px;
+            }
+            .chart-card {
+                background: #fff;
+                border-radius: 16px;
+                padding: 24px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            }
+            .chart-title {
+                font-size: 13px; font-weight: 700;
+                color: #1b3d2b; margin-bottom: 20px;
+                display: flex; align-items: center; gap: 8px;
+            }
+
+            /* Donut chart */
+            .donut-wrap {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .donut-canvas { position: relative; }
+            .donut-center {
+                position: absolute;
+                top: 50%; left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+            }
+            .donut-center .dc-value {
+                font-size: 22px; font-weight: 700; color: #1b3d2b;
+            }
+            .donut-center .dc-label {
+                font-size: 10px; color: #8a9a8a; font-weight: 600;
+            }
+            .donut-legend {
+                display: flex; gap: 20px; justify-content: center;
+            }
+            .legend-item {
+                display: flex; align-items: center; gap: 6px;
+                font-size: 12px; font-weight: 600; color: #4a5a4a;
+            }
+            .legend-dot {
+                width: 10px; height: 10px; border-radius: 50%;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="page-title">📊 Tableau de bord</div>
+
+        <!-- ── STATS HORIZONTALES ── -->
+        <div class="stats-row">
+            <div class="stat-card blue">
+                <div class="stat-icon-wrap blue">👥</div>
+                <div class="stat-info">
+                    <div class="stat-label">Utilisateurs</div>
+                    <div class="stat-value" id="valUsers">0</div>
+                    <div class="stat-sub">inscrits</div>
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-icon-wrap green">📖</div>
+                <div class="stat-info">
+                    <div class="stat-label">Actes</div>
+                    <div class="stat-value" id="valActes">0</div>
+                    <div class="stat-sub">configurés</div>
+                </div>
+            </div>
+            <div class="stat-card gold">
+                <div class="stat-icon-wrap gold">💬</div>
+                <div class="stat-info">
+                    <div class="stat-label">Citations</div>
+                    <div class="stat-value" id="valCitations">0</div>
+                    <div class="stat-sub">30 jours</div>
+                </div>
+            </div>
+            <div class="stat-card pink">
+                <div class="stat-icon-wrap pink">💡</div>
+                <div class="stat-info">
+                    <div class="stat-label">Conseils</div>
+                    <div class="stat-value" id="valConseils">0</div>
+                    <div class="stat-sub">articles</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CHARTS ── -->
+        <div class="charts-row">
+
+            <!-- Donut : Hommes / Femmes -->
+            <div class="chart-card">
+                <div class="chart-title">⚧ Répartition par Genre</div>
+                <div class="donut-wrap">
+                    <div class="donut-canvas" style="width:160px;height:160px;">
+                        <canvas id="donutGenre" width="160" height="160"></canvas>
+                        <div class="donut-center">
+                            <div class="dc-value" id="totalUsers">0</div>
+                            <div class="dc-label">TOTAL</div>
+                        </div>
+                    </div>
+                    <div class="donut-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background:#4a90d9;"></div>
+                            <span id="lblHomme">Hommes (0)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background:#e91e8c;"></div>
+                            <span id="lblFemme">Femmes (0)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bar chart : inscriptions par mois -->
+            <div class="chart-card">
+                <div class="chart-title">📈 Inscriptions (6 derniers mois)</div>
+                <canvas id="barInscriptions" height="140"></canvas>
+            </div>
+
+        </div>
+
+        <!-- Données JSF cachées pour JS -->
+        <span id="dataHommes" style="display:none;">
+            <h:outputText value="#{dashboardBean.nbHommes}"/>
+        </span>
+        <span id="dataFemmes" style="display:none;">
+            <h:outputText value="#{dashboardBean.nbFemmes}"/>
+        </span>
+        <span id="dataUsers" style="display:none;">
+            <h:outputText value="#{dashboardBean.nbUsers}"/>
+        </span>
+        <span id="dataActes" style="display:none;">
+            <h:outputText value="#{dashboardBean.nbActes}"/>
+        </span>
+        <span id="dataCitations" style="display:none;">
+            <h:outputText value="#{dashboardBean.nbCitations}"/>
+        </span>
+        <span id="dataConseils" style="display:none;">
+            <h:outputText value="#{dashboardBean.nbConseils}"/>
+        </span>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const hommes   = parseInt(document.getElementById('dataHommes').innerText)   || 0;
+            const femmes   = parseInt(document.getElementById('dataFemmes').innerText)   || 0;
+            const users    = parseInt(document.getElementById('dataUsers').innerText)    || 0;
+            const actes    = parseInt(document.getElementById('dataActes').innerText)    || 0;
+            const citations= parseInt(document.getElementById('dataCitations').innerText)|| 0;
+            const conseils = parseInt(document.getElementById('dataConseils').innerText) || 0;
+
+            // Remplir stats
+            document.getElementById('valUsers').innerText    = users;
+            document.getElementById('valActes').innerText    = actes;
+            document.getElementById('valCitations').innerText= citations;
+            document.getElementById('valConseils').innerText = conseils;
+            document.getElementById('totalUsers').innerText  = users;
+            document.getElementById('lblHomme').innerText    = 'Hommes (' + hommes + ')';
+            document.getElementById('lblFemme').innerText    = 'Femmes (' + femmes + ')';
+
+            // Donut Genre
+            new Chart(document.getElementById('donutGenre'), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [hommes || 1, femmes || 1],
+                        backgroundColor: ['#4a90d9', '#e91e8c'],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                    animation: { animateRotate: true, duration: 800 }
+                }
+            });
+
+            // Bar chart inscriptions
+            new Chart(document.getElementById('barInscriptions'), {
+                type: 'bar',
+                data: {
+                    labels: ['Oct', 'Nov', 'Déc', 'Jan', 'Fév', 'Mar'],
+                    datasets: [{
+                        label: 'Inscriptions',
+                        data: [0, 0, 0, 0, 0, users],
+                        backgroundColor: '#1b3d2b',
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f0ebe0' },
+                            ticks: { stepSize: 1 }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        </script>
+    </ui:define>
+
+</ui:composition>
+</html>

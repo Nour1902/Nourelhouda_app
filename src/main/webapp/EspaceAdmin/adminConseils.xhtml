@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/adminLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-header {
+                display: flex; align-items: center;
+                justify-content: space-between; margin-bottom: 24px;
+            }
+            .page-title { font-size: 22px; font-weight: 700; color: #1b3d2b; }
+            .btn-add {
+                background: #1b3d2b; color: #f5f0e6;
+                border: none; border-radius: 10px;
+                padding: 10px 20px; font-size: 13px; font-weight: 700;
+                cursor: pointer; font-family: 'Lato', sans-serif;
+                transition: background 0.2s;
+            }
+            .btn-add:hover { background: #2d7a50; }
+
+            .form-card {
+                background: #fff; border-radius: 16px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+                padding: 28px; margin-bottom: 24px;
+            }
+            .form-card-title {
+                font-size: 16px; font-weight: 700;
+                color: #1b3d2b; margin-bottom: 20px;
+            }
+            .form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .form-group { display: flex; flex-direction: column; gap: 6px; }
+            .form-group.full { grid-column: 1 / -1; }
+            .form-label {
+                font-size: 11px; font-weight: 700;
+                color: #8a9a8a; text-transform: uppercase; letter-spacing: 1px;
+            }
+            .form-input, .form-select, .form-textarea {
+                border: 1px solid #e0dbd0; border-radius: 8px;
+                padding: 10px 14px; font-size: 13px;
+                font-family: 'Lato', sans-serif; color: #2a3a2a;
+                outline: none; transition: border 0.2s;
+            }
+            .form-input:focus, .form-select:focus, .form-textarea:focus {
+                border-color: #1b3d2b;
+            }
+            .form-textarea { resize: vertical; min-height: 100px; }
+            .form-actions { display: flex; gap: 12px; margin-top: 20px; }
+            .btn-save {
+                background: #1b3d2b; color: #f5f0e6;
+                border: none; border-radius: 10px;
+                padding: 10px 24px; font-size: 13px; font-weight: 700;
+                cursor: pointer; font-family: 'Lato', sans-serif;
+            }
+            .btn-save:hover { background: #2d7a50; }
+            .btn-cancel {
+                background: #f0ebe0; color: #2a3a2a;
+                border: none; border-radius: 10px;
+                padding: 10px 24px; font-size: 13px; font-weight: 700;
+                cursor: pointer; font-family: 'Lato', sans-serif;
+            }
+            .btn-cancel:hover { background: #e0dbd0; }
+
+            .table-wrap {
+                background: #fff; border-radius: 16px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+                overflow: hidden;
+            }
+            .table-header {
+                padding: 18px 24px; background: #1b3d2b;
+                display: flex; align-items: center; justify-content: space-between;
+            }
+            .table-header-title { font-size: 14px; font-weight: 700; color: #f5f0e6; }
+            .table-count { font-size: 12px; color: #a8d5b8; font-weight: 600; }
+            table { width: 100%; border-collapse: collapse; }
+            thead th {
+                padding: 14px 20px; text-align: left;
+                font-size: 11px; font-weight: 700;
+                letter-spacing: 1.5px; text-transform: uppercase;
+                color: #8a9a8a; border-bottom: 1px solid #f0ebe0;
+            }
+            tbody tr { border-bottom: 1px solid #f5f0e6; transition: background 0.15s; }
+            tbody tr:hover { background: #faf7f2; }
+            tbody td { padding: 14px 20px; font-size: 13px; color: #2a3a2a; }
+
+            .text-cell {
+                max-width: 260px;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            }
+
+            .badge {
+                display: inline-block; padding: 4px 10px;
+                border-radius: 20px; font-size: 11px; font-weight: 700;
+            }
+            .badge-nutrition  { background: #e8f5ee; color: #2d7a50; }
+            .badge-spirituel  { background: #fef9e7; color: #b8860b; }
+            .badge-sport      { background: #e8f0fb; color: #4a90d9; }
+            .badge-sommeil    { background: #f0e8fb; color: #8e44ad; }
+            .badge-regles     { background: #fde8f4; color: #e91e8c; }
+            .badge-motivation { background: #fff0e0; color: #e67e22; }
+
+            .badge-tous   { background: #f0ebe0; color: #6a7a6a; }
+            .badge-homme  { background: #e8f0fb; color: #4a90d9; }
+            .badge-femme  { background: #fde8f4; color: #e91e8c; }
+
+            .badge-ramadan { background: #1b3d2b; color: #f5f0e6; }
+            .badge-general { background: #f0ebe0; color: #2a3a2a; }
+
+            .btn-delete {
+                background: #fdecea; color: #c0392b;
+                border: 1px solid #f5c6c6; border-radius: 8px;
+                padding: 6px 12px; font-size: 12px; font-weight: 700;
+                cursor: pointer; font-family: 'Lato', sans-serif;
+                transition: background 0.2s; margin-right: 6px;
+            }
+            .btn-delete:hover { background: #fbb; }
+            .btn-edit {
+                background: #e8f0fb; color: #4a90d9;
+                border: 1px solid #c5d8f5; border-radius: 8px;
+                padding: 6px 12px; font-size: 12px; font-weight: 700;
+                cursor: pointer; font-family: 'Lato', sans-serif;
+                transition: background 0.2s;
+            }
+            .btn-edit:hover { background: #cce0ff; }
+
+            .popup-overlay {
+                display: none; position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999; align-items: center; justify-content: center;
+            }
+            .popup-overlay.show { display: flex; }
+            .popup-box {
+                background: #fff; border-radius: 20px;
+                padding: 36px; text-align: center;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+                max-width: 360px; width: 90%;
+                animation: fadeUp 0.3s ease;
+            }
+            @keyframes fadeUp {
+                from { opacity:0; transform:translateY(20px); }
+                to   { opacity:1; transform:translateY(0); }
+            }
+            .popup-icon { font-size: 52px; margin-bottom: 16px; }
+            .popup-title { font-size: 20px; font-weight: 700; color: #1b3d2b; margin-bottom: 8px; }
+            .popup-msg { font-size: 14px; color: #6a7a6a; margin-bottom: 28px; line-height: 1.6; }
+            .popup-actions { display: flex; gap: 12px; justify-content: center; }
+            .popup-btn {
+                padding: 12px 28px; border-radius: 12px; border: none;
+                font-family: 'Lato', sans-serif; font-size: 14px; font-weight: 700;
+                cursor: pointer; transition: all 0.2s;
+            }
+            .popup-btn.confirm { background: #c0392b; color: #fff; }
+            .popup-btn.confirm:hover { background: #e74c3c; }
+            .popup-btn.cancel  { background: #f0ebe0; color: #2a3a2a; }
+            .popup-btn.cancel:hover  { background: #e0dbd0; }
+            .popup-btn.success { background: #1b3d2b; color: #f5f0e6; }
+            .popup-btn.success:hover { background: #2d7a50; }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <!-- POPUP CONFIRMATION -->
+        <div class="popup-overlay" id="popupConfirm">
+            <div class="popup-box">
+                <div class="popup-icon">🗑️</div>
+                <div class="popup-title">Supprimer ?</div>
+                <div class="popup-msg">
+                    Êtes-vous sûr de vouloir supprimer ce conseil ?<br/>
+                    <strong>Cette action est irréversible.</strong>
+                </div>
+                <div class="popup-actions">
+                    <button class="popup-btn cancel" onclick="closeConfirm()">Annuler</button>
+                    <button class="popup-btn confirm" id="btnConfirmDelete">Supprimer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- POPUP SUCCÈS -->
+        <div class="popup-overlay" id="popupSuccess">
+            <div class="popup-box">
+                <div class="popup-icon">✅</div>
+                <div class="popup-title">Supprimé !</div>
+                <div class="popup-msg">Le conseil a été supprimé avec succès.</div>
+                <div class="popup-actions">
+                    <button class="popup-btn success" onclick="closePopup()">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- POPUP ERREUR -->
+        <div class="popup-overlay" id="popupError">
+            <div class="popup-box">
+                <div class="popup-icon">❌</div>
+                <div class="popup-title">Erreur !</div>
+                <div class="popup-msg">Impossible de supprimer ce conseil.</div>
+                <div class="popup-actions">
+                    <button class="popup-btn confirm" onclick="closePopup()">Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div class="page-title">💡 Gestion Conseils</div>
+            <h:form>
+                <h:commandButton value="➕ Ajouter un conseil"
+                                 styleClass="btn-add"
+                                 action="#{conseilBean.afficherForm}"
+                                 rendered="#{!conseilBean.showForm}"/>
+            </h:form>
+        </div>
+
+        <!-- FORMULAIRE -->
+        <h:panelGroup rendered="#{conseilBean.showForm}">
+            <div class="form-card">
+                <div class="form-card-title">
+                    #{conseilBean.editMode ? '✏️ Modifier le conseil' : '➕ Nouveau conseil'}
+                </div>
+                <h:form>
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Titre</label>
+                            <h:inputText value="#{conseilBean.conseil.titre}"
+                                         styleClass="form-input"
+                                         required="true"/>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Contenu</label>
+                            <h:inputTextarea value="#{conseilBean.conseil.contenu}"
+                                             styleClass="form-textarea"
+                                             required="true"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Catégorie</label>
+                            <h:selectOneMenu value="#{conseilBean.conseil.categorie}"
+                                             styleClass="form-select"
+                                             required="true">
+                                <f:selectItem itemLabel="-- Choisir --" itemValue=""/>
+                                <f:selectItems value="#{conseilBean.categories}"
+                                               var="cat"
+                                               itemLabel="#{cat}"
+                                               itemValue="#{cat}"/>
+                            </h:selectOneMenu>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Genre</label>
+                            <h:selectOneMenu value="#{conseilBean.conseil.genre}"
+                                             styleClass="form-select"
+                                             required="true">
+                                <f:selectItem itemLabel="-- Choisir --" itemValue=""/>
+                                <f:selectItems value="#{conseilBean.genres}"
+                                               var="g"
+                                               itemLabel="#{g}"
+                                               itemValue="#{g}"/>
+                            </h:selectOneMenu>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Spécial Ramadan ?</label>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                                <h:selectBooleanCheckbox value="#{conseilBean.conseil.pourRamadan}" id="chkRamadan"/>
+                                <label for="chkRamadan" style="font-size: 13px; color: #2a3a2a; font-weight: 600;">Oui, uniquement pendant Ramadan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <h:commandButton
+                                value="#{conseilBean.editMode ? '💾 Modifier' : '💾 Enregistrer'}"
+                                styleClass="btn-save"
+                                action="#{conseilBean.sauvegarder}"/>
+                        <h:commandButton value="Annuler"
+                                         styleClass="btn-cancel"
+                                         action="#{conseilBean.annulerForm}"
+                                         immediate="true"/>
+                    </div>
+                </h:form>
+            </div>
+        </h:panelGroup>
+
+        <!-- TABLEAU -->
+        <div class="table-wrap">
+            <div class="table-header">
+                <span class="table-header-title">💡 Liste des conseils</span>
+                <span class="table-count">
+                    <h:outputText value="#{conseilBean.conseils.size()} conseils"/>
+                </span>
+            </div>
+
+            <h:form id="formConseils">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Contenu</th>
+                        <th>Catégorie</th>
+                        <th>Genre</th>
+                        <th>Période</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <h:dataTable value="#{conseilBean.conseils}" var="c">
+                        <h:column>
+                            <div class="text-cell">
+                                <strong><h:outputText value="#{c.titre}"/></strong>
+                            </div>
+                        </h:column>
+                        <h:column>
+                            <div class="text-cell">
+                                <h:outputText value="#{c.contenu}"/>
+                            </div>
+                        </h:column>
+                        <h:column>
+                            <span class="badge badge-#{c.categorie.name().toLowerCase()}">
+                                <h:outputText value="#{c.categorie}"/>
+                            </span>
+                        </h:column>
+                        <h:column>
+                            <span class="badge badge-#{c.genre.name().toLowerCase()}">
+                                <h:outputText value="#{c.genre}"/>
+                            </span>
+                        </h:column>
+                        <h:column>
+                            <h:panelGroup rendered="#{c.pourRamadan}">
+                                <span class="badge badge-ramadan">🌙 Ramadan</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!c.pourRamadan}">
+                                <span class="badge badge-general">📅 Général</span>
+                            </h:panelGroup>
+                        </h:column>
+                        <h:column>
+                            <h:commandButton value="✏️ Éditer"
+                                             styleClass="btn-edit"
+                                             action="#{conseilBean.prepareEdit}">
+                                <f:setPropertyActionListener
+                                        target="#{conseilBean.conseil}"
+                                        value="#{c}"/>
+                            </h:commandButton>
+                            <h:commandButton value="🗑 Supprimer"
+                                             styleClass="btn-delete"
+                                             action="#{conseilBean.delete}"
+                                             onclick="showConfirm(this); return false;">
+                                <f:setPropertyActionListener
+                                        target="#{conseilBean.conseil}"
+                                        value="#{c}"/>
+                            </h:commandButton>
+                        </h:column>
+                    </h:dataTable>
+                    </tbody>
+                </table>
+
+                <h:panelGroup id="popupTrigger">
+                    <h:outputScript rendered="#{conseilBean.deleteSuccess}">
+                        document.getElementById('popupSuccess').classList.add('show');
+                    </h:outputScript>
+                    <h:outputScript rendered="#{conseilBean.deleteAttempted and !conseilBean.deleteSuccess}">
+                        document.getElementById('popupError').classList.add('show');
+                    </h:outputScript>
+                </h:panelGroup>
+
+                <h:commandButton id="resetBtn"
+                                 action="#{conseilBean.resetFlags}"
+                                 style="display:none"/>
+            </h:form>
+        </div>
+
+        <script>
+            let pendingBtn = null;
+
+            function showConfirm(btn) {
+                pendingBtn = btn;
+                document.getElementById('popupConfirm').classList.add('show');
+            }
+
+            function closeConfirm() {
+                document.getElementById('popupConfirm').classList.remove('show');
+            }
+
+            document.getElementById('btnConfirmDelete').onclick = function() {
+                closeConfirm();
+                if (pendingBtn) {
+                    pendingBtn.onclick = null;
+                    pendingBtn.click();
+                    pendingBtn = null;
+                }
+            };
+
+            function closePopup() {
+                document.getElementById('popupSuccess').classList.remove('show');
+                document.getElementById('popupError').classList.remove('show');
+                document.getElementById('formConseils:resetBtn').click();
+            }
+        </script>
+
+    </ui:define>
+
+</ui:composition>
+</html>

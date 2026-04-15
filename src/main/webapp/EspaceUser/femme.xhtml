@@ -1,0 +1,415 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-title {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 13px;
+                font-weight: 700;
+                color: #aa3d53;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 20px;
+                margin-top: 10px;
+            }
+            
+            .femme-layout {
+                display: flex;
+                gap: 30px;
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+            
+            .femme-left {
+                flex: 1;
+                min-width: 320px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+            .femme-right {
+                flex: 1;
+                min-width: 320px;
+            }
+
+            /* Motivation Cards */
+            .femme-card {
+                background: #ffd3dd;
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 16px;
+                box-shadow: 0 4px 15px rgba(220,120,140,0.1);
+                border-left: 4px solid #ea9cb0;
+            }
+            .femme-card-title {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                font-weight: 700;
+                color: #8c283d;
+                margin-bottom: 8px;
+            }
+            .femme-card-text { font-size: 13px; color: #5a3842; line-height: 1.5; }
+
+            /* Calendar Styles */
+            .calendar-container {
+                background: #fff;
+                border-radius: 20px;
+                padding: 24px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            }
+            
+            .cal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            
+            .cal-header h2 {
+                color: #8c283d;
+                font-size: 18px;
+                margin: 0;
+            }
+            
+            .cal-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 18px;
+                color: #aa3d53;
+                padding: 5px 10px;
+                border-radius: 8px;
+                transition: 0.2s;
+            }
+            
+            .cal-btn:hover {
+                background: #ffd3dd;
+            }
+            
+            .cal-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 5px;
+                text-align: center;
+            }
+            
+            .cal-day-name {
+                font-size: 12px;
+                font-weight: 700;
+                color: #999;
+                padding-bottom: 10px;
+            }
+            
+            .cal-day {
+                aspect-ratio: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                font-weight: 500;
+                border-radius: 50%;
+                cursor: pointer;
+                color: #333;
+                transition: 0.2s;
+            }
+            
+            .cal-day:hover {
+                background-color: #f0f0f0;
+            }
+            
+            .cal-day.empty {
+                cursor: default;
+            }
+            .cal-day.empty:hover {
+                background-color: transparent;
+            }
+            
+            .cal-day.today {
+                border: 2px solid #8c283d;
+                color: #8c283d;
+                font-weight: 700;
+            }
+            
+            .cal-day.tracked {
+                background-color: #aa3d53;
+                color: white;
+                box-shadow: 0 4px 10px rgba(170, 61, 83, 0.4);
+            }
+
+            .cal-legend {
+                display: flex;
+                gap: 15px;
+                margin-top: 20px;
+                font-size: 12px;
+                color: #666;
+            }
+            
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            
+            .legend-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+            .legend-dot.tracked { background: #aa3d53; }
+            .legend-dot.today { border: 2px solid #8c283d; }
+            
+            /* Form Add Cycle */
+            .cycle-form {
+                background: #fff;
+                border-radius: 20px;
+                padding: 24px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            }
+            
+            .form-title {
+                color: #8c283d;
+                font-size: 16px;
+                font-weight: 700;
+                margin-bottom: 15px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-group label {
+                display: block;
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 5px;
+            }
+            
+            .form-control {
+                width: 100%;
+                padding: 10px 15px;
+                border-radius: 10px;
+                border: 1px solid #ddd;
+                font-family: inherit;
+                box-sizing: border-box;
+            }
+            
+            .btn-submit {
+                background: #8c283d;
+                color: #fff;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                width: 100%;
+                transition: 0.3s;
+            }
+            
+            .btn-submit:hover {
+                background: #aa3d53;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        
+        <!-- Inject JSON correctly via JSF without EL bugs in JS -->
+        <h:outputText id="cyclesData" value="#{userSuivireglesBean.cyclesJson}" style="display:none;" />
+        
+        <div class="femme-layout">
+            
+            <!-- Colonne Gauche : Calendrier et Formulaire -->
+            <div class="femme-left">
+                <div class="page-title">
+                    <span>🗓️</span> CALENDRIER DE SUIVI MENSTRUEL
+                </div>
+                
+                <!-- Calendrier Interactif -->
+                <div class="calendar-container">
+                    <div class="cal-header">
+                        <button class="cal-btn" onclick="changeMonth(-1); return false;">&#10094;</button>
+                        <h2 id="monthYearDisplay">Mois Année</h2>
+                        <button class="cal-btn" onclick="changeMonth(1); return false;">&#10095;</button>
+                    </div>
+                    
+                    <div class="cal-grid" id="calDaysNames">
+                        <div class="cal-day-name">Lun</div>
+                        <div class="cal-day-name">Mar</div>
+                        <div class="cal-day-name">Mer</div>
+                        <div class="cal-day-name">Jeu</div>
+                        <div class="cal-day-name">Ven</div>
+                        <div class="cal-day-name">Sam</div>
+                        <div class="cal-day-name">Dim</div>
+                    </div>
+                    
+                    <div class="cal-grid" id="calGrid">
+                        <!-- Généré par JS -->
+                    </div>
+                    
+                    <div class="cal-legend">
+                        <div class="legend-item"><div class="legend-dot tracked"></div> Période de non-jeûne</div>
+                        <div class="legend-item"><div class="legend-dot today"></div> Aujourd'hui</div>
+                    </div>
+                </div>
+                
+                <!-- Formulaire d'ajout -->
+                <div class="cycle-form">
+                    <div class="form-title">Enregistrer une nouvelle période</div>
+                    <h:form>
+                        <div class="form-group">
+                            <label>Date de début</label>
+                            <h:inputText value="#{userSuivireglesBean.dateDebut}" type="date" class="form-control" required="true">
+                                <f:convertDateTime type="localDate" pattern="yyyy-MM-dd" />
+                            </h:inputText>
+                        </div>
+                        <div class="form-group">
+                            <label>Date de fin (optionnel)</label>
+                            <h:inputText value="#{userSuivireglesBean.dateFin}" type="date" class="form-control">
+                                <f:convertDateTime type="localDate" pattern="yyyy-MM-dd" />
+                            </h:inputText>
+                        </div>
+                        <div class="form-group">
+                            <label>Notes (Symptômes, rappels)</label>
+                            <h:inputTextarea value="#{userSuivireglesBean.notes}" class="form-control" rows="2" />
+                        </div>
+                        <h:commandButton action="#{userSuivireglesBean.enregistrerCycle}" value="Enregistrer le cycle" styleClass="btn-submit" />
+                    </h:form>
+                </div>
+                
+            </div>
+            
+            <!-- Colonne Droite : Motivations -->
+            <div class="femme-right">
+                
+                <ui:fragment rendered="#{userConseilFemmeBean.enPeriodeRegles}">
+                    <div class="page-title">
+                        <span>💪</span> MOTIVATIONS SPIRITUELLES
+                    </div>
+            
+                    <ui:fragment rendered="#{empty userConseilFemmeBean.motifsFemme}">
+                        <!-- Cas où l'admin n'a pas encore ajouté de conseils spécifiques -->
+                        <div class="femme-card" style="background:#f9f9f9; border-left: 4px solid #ddd; text-align: center;">
+                            <div class="femme-card-text" style="color: #888;">
+                                Aucun conseil spirituel spécifique n'a été publié par l'administrateur pour le moment.
+                            </div>
+                        </div>
+                    </ui:fragment>
+            
+                    <ui:repeat value="#{userConseilFemmeBean.motifsFemme}" var="motif">
+                        <div class="femme-card">
+                            <div class="femme-card-title">✨ #{motif.titre}</div>
+                            <div class="femme-card-text">#{motif.contenu}</div>
+                        </div>
+                    </ui:repeat>
+                </ui:fragment>
+                
+                <ui:fragment rendered="#{not userConseilFemmeBean.enPeriodeRegles}">
+                    <div class="page-title">
+                        <span>🌸</span> BIEN-ÊTRE FÉMININ
+                    </div>
+                    <div class="femme-card" style="background:#fdfcfc; border-left: 4px solid #f2e2e6;">
+                        <div class="femme-card-text" style="color: #a4818a; text-align: center; padding: 20px 0;">
+                            Enregistrez vos dates de menstruations dans le calendrier pour débloquer des conseils spirituels et astuces adaptés à cette période.
+                        </div>
+                    </div>
+                </ui:fragment>
+            </div>
+            
+        </div>
+
+        <script type="text/javascript">
+        //<![CDATA[
+            // Logique du Calendrier
+            let currentDate = new Date();
+            let trackedCycles = [];
+            
+            document.addEventListener("DOMContentLoaded", function() {
+                // Initialiser les cycles depuis le composant h:outputText
+                try {
+                    let jsonText = document.getElementById('cyclesData').innerText;
+                    trackedCycles = JSON.parse(jsonText);
+                } catch(e) {
+                    console.error("Erreur de parsing des cycles", e);
+                }
+                renderCalendar();
+            });
+            
+            function changeMonth(direction) {
+                currentDate.setMonth(currentDate.getMonth() + direction);
+                renderCalendar();
+            }
+            
+            function isDateTracked(year, month, day) {
+                let d = new Date(year, month, day);
+                d.setHours(0,0,0,0);
+                
+                for(let i=0; i<trackedCycles.length; i++) {
+                    let startParts = trackedCycles[i].start.split('-');
+                    let endParts = trackedCycles[i].end.split('-');
+                    
+                    let startDate = new Date(startParts[0], startParts[1]-1, startParts[2]);
+                    let endDate = new Date(endParts[0], endParts[1]-1, endParts[2]);
+                    
+                    startDate.setHours(0,0,0,0);
+                    endDate.setHours(0,0,0,0);
+                    
+                    if(d >= startDate && d <= endDate) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function renderCalendar() {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                
+                const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+                document.getElementById('monthYearDisplay').innerText = monthNames[month] + " " + year;
+                
+                const firstDay = new Date(year, month, 1).getDay(); // 0 is Sunday
+                // Adjust to make Monday first day (0)
+                let firstDayAdjusted = firstDay === 0 ? 6 : firstDay - 1;
+                
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                const today = new Date();
+                
+                let gridHtml = '';
+                
+                // Champs vides au début
+                for(let i = 0; i < firstDayAdjusted; i++) {
+                    gridHtml += '<div class="cal-day empty"></div>';
+                }
+                
+                // Jours du mois
+                for(let day = 1; day <= daysInMonth; day++) {
+                    let classes = "cal-day";
+                    
+                    if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                        classes += " today";
+                    }
+                    
+                    if (isDateTracked(year, month, day)) {
+                        classes += " tracked";
+                    }
+                    
+                    gridHtml += '<div class="' + classes + '">' + day + '</div>';
+                }
+                
+                document.getElementById('calGrid').innerHTML = gridHtml;
+            }
+        //]]>
+        </script>
+        
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,136 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-title {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                font-weight: 700;
+                color: #2a3a2a;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 20px;
+                margin-top: 10px;
+            }
+            .horaire-location {
+                text-align: center;
+                background: rgba(255,255,255,0.6);
+                padding: 10px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #1b3d2b;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                margin: 0 auto 20px;
+            }
+            .horaire-list {
+                background: #fff;
+                border-radius: 16px;
+                padding: 10px 20px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            }
+            .horaire-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 16px 0;
+                border-bottom: 1px solid #f0ebe0;
+                font-size: 16px;
+                font-weight: 600;
+                color: #2a3a2a;
+            }
+            .horaire-item:last-child { border-bottom: none; }
+            .horaire-item.active {
+                background: #103422;
+                color: #fff;
+                margin: 0 -20px;
+                padding: 16px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(16,52,42,0.2);
+            }
+            .horaire-item-left { display: flex; align-items: center; gap: 12px; }
+            .h-icon { font-size: 20px; }
+            .h-ar { font-family: 'Amiri', serif; font-size: 18px; color: #a8d5b8; }
+            .horaire-item.active .h-ar { color: #d8c281; }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="page-title">
+            <span>🕌</span> HORAIRES DES PRIÈRES
+        </div>
+
+        <div style="text-align:center;">
+            <div class="horaire-location">
+                🗺️ #{userHoraireQiblaBean.ville} — Aujourd'hui
+            </div>
+        </div>
+
+        <div class="horaire-list">
+            <div class="horaire-item #{userHoraireQiblaBean.nextPrayer == 'IMSAK' ? 'active' : ''}">
+                <div class="horaire-item-left"><span class="h-icon">🌙</span> Imsak
+                    <h:outputText value=" ←" rendered="#{userHoraireQiblaBean.nextPrayer == 'IMSAK'}" />
+                </div>
+                <div style="display:flex; gap:16px;">
+                    <span class="h-ar">الإمساك</span>
+                    <h:outputText value="#{userHoraireQiblaBean.horaireAujourdhui != null ? userHoraireQiblaBean.horaireAujourdhui.imsak : '04:47'}"><f:convertDateTime pattern="HH:mm" type="localTime"/></h:outputText>
+                </div>
+            </div>
+            <div class="horaire-item #{userHoraireQiblaBean.nextPrayer == 'FAJR' ? 'active' : ''}">
+                <div class="horaire-item-left"><span class="h-icon">🌅</span> Fajr
+                    <h:outputText value=" ←" rendered="#{userHoraireQiblaBean.nextPrayer == 'FAJR'}" />
+                </div>
+                <div style="display:flex; gap:16px;">
+                    <span class="h-ar">الفجر</span>
+                    <h:outputText value="#{userHoraireQiblaBean.horaireAujourdhui != null ? userHoraireQiblaBean.horaireAujourdhui.fajr : '04:57'}"><f:convertDateTime pattern="HH:mm" type="localTime"/></h:outputText>
+                </div>
+            </div>
+            <div class="horaire-item #{userHoraireQiblaBean.nextPrayer == 'DHUHR' ? 'active' : ''}">
+                <div class="horaire-item-left"><span class="h-icon">☀️</span> Dhuhr
+                    <h:outputText value=" ←" rendered="#{userHoraireQiblaBean.nextPrayer == 'DHUHR'}" />
+                </div>
+                <div style="display:flex; gap:16px;">
+                    <span class="h-ar">الظهر</span>
+                    <h:outputText value="#{userHoraireQiblaBean.horaireAujourdhui != null ? userHoraireQiblaBean.horaireAujourdhui.dhuhr : '13:52'}"><f:convertDateTime pattern="HH:mm" type="localTime"/></h:outputText>
+                </div>
+            </div>
+            <div class="horaire-item #{userHoraireQiblaBean.nextPrayer == 'ASR' ? 'active' : ''}">
+                <div class="horaire-item-left"><span class="h-icon">🌤️</span> Asr
+                    <h:outputText value=" ←" rendered="#{userHoraireQiblaBean.nextPrayer == 'ASR'}" />
+                </div>
+                <div style="display:flex; gap:16px;">
+                    <span class="h-ar">العصر</span>
+                    <h:outputText value="#{userHoraireQiblaBean.horaireAujourdhui != null ? userHoraireQiblaBean.horaireAujourdhui.asr : '17:15'}"><f:convertDateTime pattern="HH:mm" type="localTime"/></h:outputText>
+                </div>
+            </div>
+            <div class="horaire-item #{userHoraireQiblaBean.nextPrayer == 'MAGHRIB' ? 'active' : ''}">
+                <div class="horaire-item-left"><span class="h-icon">🌇</span> Maghrib
+                    <h:outputText value=" ←" rendered="#{userHoraireQiblaBean.nextPrayer == 'MAGHRIB'}" />
+                </div>
+                <div style="display:flex; gap:16px;">
+                    <span class="h-ar">المغرب</span>
+                    <h:outputText value="#{userHoraireQiblaBean.horaireAujourdhui != null ? userHoraireQiblaBean.horaireAujourdhui.maghrib : '18:24'}"><f:convertDateTime pattern="HH:mm" type="localTime"/></h:outputText>
+                </div>
+            </div>
+            <div class="horaire-item #{userHoraireQiblaBean.nextPrayer == 'ISHA' ? 'active' : ''}">
+                <div class="horaire-item-left"><span class="h-icon">🌌</span> Isha
+                    <h:outputText value=" ←" rendered="#{userHoraireQiblaBean.nextPrayer == 'ISHA'}" />
+                </div>
+                <div style="display:flex; gap:16px;">
+                    <span class="h-ar">العشاء</span>
+                    <h:outputText value="#{userHoraireQiblaBean.horaireAujourdhui != null ? userHoraireQiblaBean.horaireAujourdhui.isha : '19:48'}"><f:convertDateTime pattern="HH:mm" type="localTime"/></h:outputText>
+                </div>
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

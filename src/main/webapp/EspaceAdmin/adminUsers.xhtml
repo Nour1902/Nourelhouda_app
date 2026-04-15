@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/adminLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-title {
+                font-size: 22px; font-weight: 700;
+                color: #1b3d2b; margin-bottom: 24px;
+            }
+            .table-wrap {
+                background: #fff;
+                border-radius: 16px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+                overflow: hidden;
+            }
+            .table-header {
+                padding: 18px 24px;
+                background: #1b3d2b;
+                display: flex; align-items: center;
+                justify-content: space-between;
+            }
+            .table-header-title {
+                font-size: 14px; font-weight: 700; color: #f5f0e6;
+            }
+            .table-count {
+                font-size: 12px; color: #a8d5b8; font-weight: 600;
+            }
+            table { width: 100%; border-collapse: collapse; }
+            thead th {
+                padding: 14px 20px; text-align: left;
+                font-size: 11px; font-weight: 700;
+                letter-spacing: 1.5px; text-transform: uppercase;
+                color: #8a9a8a; border-bottom: 1px solid #f0ebe0;
+            }
+            tbody tr {
+                border-bottom: 1px solid #f5f0e6;
+                transition: background 0.15s;
+            }
+            tbody tr:hover { background: #faf7f2; }
+            tbody td { padding: 14px 20px; font-size: 14px; color: #2a3a2a; }
+
+            /* Avatar */
+            .user-cell { display: flex; align-items: center; gap: 12px; }
+            .user-avatar {
+                width: 36px; height: 36px; border-radius: 50%;
+                background: #e8f5ee;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 16px; font-weight: 700; color: #1b3d2b;
+                flex-shrink: 0;
+            }
+            .user-name { font-weight: 700; font-size: 13px; color: #1b3d2b; }
+            .user-email { font-size: 11px; color: #8a9a8a; }
+
+            /* Badge */
+            .badge {
+                display: inline-block;
+                padding: 4px 10px; border-radius: 20px;
+                font-size: 11px; font-weight: 700;
+            }
+            .badge-homme { background: #e8f0fb; color: #4a90d9; }
+            .badge-femme { background: #fde8f4; color: #e91e8c; }
+            .badge-admin { background: #fef9e7; color: #b8860b; }
+            .badge-user  { background: #e8f5ee; color: #2d7a50; }
+
+            /* Delete btn */
+            .btn-delete {
+                background: #fdecea; color: #c0392b;
+                border: 1px solid #f5c6c6; border-radius: 8px;
+                padding: 6px 14px; font-size: 12px; font-weight: 700;
+                cursor: pointer; font-family: 'Lato', sans-serif;
+                transition: background 0.2s;
+            }
+            .btn-delete:hover { background: #fbb; }
+
+            /* ── POPUP CONFIRM ── */
+            .popup-overlay {
+                display: none; position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999; align-items: center; justify-content: center;
+            }
+            .popup-overlay.show { display: flex; }
+            .popup-box {
+                background: #fff; border-radius: 20px;
+                padding: 36px; text-align: center;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+                max-width: 360px; width: 90%;
+                animation: fadeUp 0.3s ease;
+            }
+            @keyframes fadeUp {
+                from { opacity:0; transform:translateY(20px); }
+                to   { opacity:1; transform:translateY(0); }
+            }
+            .popup-icon { font-size: 52px; margin-bottom: 16px; }
+            .popup-title {
+                font-size: 20px; font-weight: 700;
+                color: #1b3d2b; margin-bottom: 8px;
+            }
+            .popup-msg { font-size: 14px; color: #6a7a6a; margin-bottom: 28px; line-height: 1.6; }
+            .popup-actions { display: flex; gap: 12px; justify-content: center; }
+            .popup-btn {
+                padding: 12px 28px; border-radius: 12px; border: none;
+                font-family: 'Lato', sans-serif; font-size: 14px; font-weight: 700;
+                cursor: pointer; transition: all 0.2s;
+            }
+            .popup-btn.confirm { background: #c0392b; color: #fff; }
+            .popup-btn.confirm:hover { background: #e74c3c; }
+            .popup-btn.cancel { background: #f0ebe0; color: #2a3a2a; }
+            .popup-btn.cancel:hover { background: #e0dbd0; }
+            .popup-btn.success { background: #1b3d2b; color: #f5f0e6; }
+            .popup-btn.success:hover { background: #2d7a50; }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <!-- ── POPUP CONFIRMATION SUPPRESSION ── -->
+        <div class="popup-overlay" id="popupConfirm">
+            <div class="popup-box">
+                <div class="popup-icon">🗑️</div>
+                <div class="popup-title">Supprimer ?</div>
+                <div class="popup-msg">
+                    Êtes-vous sûr de vouloir supprimer cet utilisateur ?<br/>
+                    <strong>Cette action est irréversible.</strong>
+                </div>
+                <div class="popup-actions">
+                    <button class="popup-btn cancel" onclick="closeConfirm()">Annuler</button>
+                    <button class="popup-btn confirm" id="btnConfirmDelete">Supprimer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── POPUP SUCCÈS ── -->
+        <div class="popup-overlay" id="popupSuccess">
+            <div class="popup-box">
+                <div class="popup-icon">✅</div>
+                <div class="popup-title">Supprimé !</div>
+                <div class="popup-msg">L'utilisateur a été supprimé avec succès.</div>
+                <div class="popup-actions">
+                    <button class="popup-btn success" onclick="closePopup()">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── POPUP ERREUR ── -->
+        <div class="popup-overlay" id="popupError">
+            <div class="popup-box">
+                <div class="popup-icon">❌</div>
+                <div class="popup-title">Erreur !</div>
+                <div class="popup-msg">Impossible de supprimer cet utilisateur.</div>
+                <div class="popup-actions">
+                    <button class="popup-btn confirm" onclick="closePopup()">Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-title">👥 Gestion Utilisateurs</div>
+
+        <div class="table-wrap">
+            <div class="table-header">
+                <span class="table-header-title">👥 Liste des utilisateurs</span>
+                <span class="table-count">
+                    <h:outputText value="#{utilisateurBean.users.size()} inscrits"/>
+                </span>
+            </div>
+
+            <h:form id="formUsers">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Ville</th>
+                        <th>Genre</th>
+                        <th>Inscrit le</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <h:dataTable value="#{utilisateurBean.users}" var="u">
+                        <h:column>
+                            <div class="user-cell">
+                                <div class="user-avatar">
+                                    <h:outputText value="#{u.prenom.substring(0,1)}"/>
+                                </div>
+                                <div>
+                                    <div class="user-name">
+                                        <h:outputText value="#{u.prenom} #{u.nom}"/>
+                                    </div>
+                                    <div class="user-email">
+                                        <h:outputText value="#{u.email}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:column>
+                        <h:column>
+                            <h:outputText value="#{u.ville}"/>
+                        </h:column>
+                        <h:column>
+                                <span class="badge #{u.genre == 'Homme' ? 'badge-homme' : 'badge-femme'}">
+                                    <h:outputText value="#{u.genre == 'Homme' ? '👨 Homme' : '👩 Femme'}"/>
+                                </span>
+                        </h:column>
+
+                        <h:column>
+                            <h:outputText value="#{u.dateInscreption}"/>
+                        </h:column>
+                        <h:column>
+                            <h:commandButton value="🗑 Supprimer"
+                                             styleClass="btn-delete"
+                                             action="#{utilisateurBean.delete}"
+                                             onclick="showConfirm(this); return false;">
+                                <f:setPropertyActionListener
+                                        target="#{utilisateurBean.user}"
+                                        value="#{u}"/>
+                            </h:commandButton>
+                        </h:column>
+                    </h:dataTable>
+                    </tbody>
+                </table>
+
+                <!-- Déclencheur popup résultat -->
+                <h:panelGroup id="popupTrigger">
+                    <h:outputScript rendered="#{utilisateurBean.deleteSuccess}">
+                        document.getElementById('popupSuccess').classList.add('show');
+                    </h:outputScript>
+                    <h:outputScript rendered="#{utilisateurBean.deleteAttempted and !utilisateurBean.deleteSuccess}">
+                        document.getElementById('popupError').classList.add('show');
+                    </h:outputScript>
+                </h:panelGroup>
+
+            </h:form>
+        </div>
+
+        <script>
+            let pendingBtn = null;
+
+            // Affiche popup confirmation personnalisé
+            function showConfirm(btn) {
+                pendingBtn = btn;
+                document.getElementById('popupConfirm').classList.add('show');
+            }
+
+            // Ferme popup confirmation
+            function closeConfirm() {
+                document.getElementById('popupConfirm').classList.remove('show');
+
+            }
+
+            // Confirme et soumet le formulaire JSF
+            document.getElementById('btnConfirmDelete').onclick = function() {
+                closeConfirm();
+                if (pendingBtn){
+                    pendingBtn.onclick=null;
+                    pendingBtn.click();
+                    pendingBtn=null;
+                }
+            };
+
+            // Ferme popup succès/erreur
+            function closePopup() {
+                document.getElementById('popupSuccess').classList.remove('show');
+                document.getElementById('popupError').classList.remove('show');
+            }
+        </script>
+
+    </ui:define>
+
+</ui:composition>
+</html>

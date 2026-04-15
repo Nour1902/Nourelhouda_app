@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:c="jakarta.tags.core"
+                template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-title {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                font-weight: 700;
+                color: #2a3a2a;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 16px;
+                margin-top: 10px;
+            }
+
+            .stats-grid-4 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+            .stat-box-small {
+                background: #fff;
+                border-radius: 12px;
+                padding: 16px 12px;
+                text-align: center;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            }
+            .stat-box-small .icon { font-size: 24px; margin-bottom: 6px; }
+            .stat-box-small .val { font-size: 22px; font-weight: 700; color: #103422; line-height: 1; margin-bottom: 4px; }
+            .stat-box-small .lbl { font-size: 9px; font-weight: 700; color: #8a9a8a; text-transform: uppercase; letter-spacing: 1px; }
+
+            .chart-card {
+                background: #fff;
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+                margin-bottom: 24px;
+            }
+            .chart-title { font-size: 13px; font-weight: 600; color: #2a3a2a; margin-bottom: 16px; }
+
+            .bar-chart-container {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                height: 120px;
+                gap: 4px;
+                padding-bottom: 20px;
+                position: relative;
+                border-bottom: 1px solid #f0ebe0;
+            }
+            .bar-wrap {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-end;
+                height: 100%;
+            }
+            .bar-fill {
+                width: 100%;
+                max-width: 12px;
+                background: #4caf75;
+                border-radius: 4px 4px 0 0;
+                transition: 0.3s;
+            }
+            .bar-fill.highlight { background: #d8c281; }
+            .bar-label {
+                position: absolute;
+                bottom: -20px;
+                font-size: 9px;
+                color: #8a9a8a;
+                font-weight: 600;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="page-title">
+            <span>📊</span> STATISTIQUES
+        </div>
+
+        <div class="stats-grid-4">
+            <div class="stat-box-small">
+                <div class="icon">📅</div>
+                <div class="val">#{userStatsBean.joursSuivis}</div>
+                <div class="lbl">Jours Suivis</div>
+            </div>
+            <div class="stat-box-small">
+                <div class="icon">⭐</div>
+                <div class="val">#{userStatsBean.moyenneScore}</div>
+                <div class="lbl">Moy. Score</div>
+            </div>
+            <div class="stat-box-small">
+                <div class="icon">🏆</div>
+                <div class="val">#{userStatsBean.meilleurScore}</div>
+                <div class="lbl">Meilleur</div>
+            </div>
+            <div class="stat-box-small">
+                <div class="icon">📈</div>
+                <div class="val">#{userStatsBean.regularite}%</div>
+                <div class="lbl">Régularité</div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title">Evolution du score — #{userStatsBean.scoresParJour.size()} jours</div>
+            <div class="bar-chart-container">
+                <c:forEach items="#{userStatsBean.scoresParJour}" var="score" varStatus="loop">
+                    <div class="bar-wrap">
+                        <div class="bar-fill #{loop.index == (userStatsBean.scoresParJour.size() - 1) ? 'highlight' : ''}" style="height: #{userStatsBean.meilleurScore == 0 ? 0 : (score * 100 / userStatsBean.meilleurScore)}%"></div>
+                        <div class="bar-label" style="left: calc(#{(loop.index * 100) / (userStatsBean.scoresParJour.size() == 0 ? 1 : userStatsBean.scoresParJour.size())}% + 2%);">
+                           J#{loop.index + 1}
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
+        </div>
+        
+    </ui:define>
+</ui:composition>

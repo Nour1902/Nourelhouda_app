@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .welcome-card {
+                background: #103422;
+                color: #fff;
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 16px;
+                position: relative;
+                overflow: hidden;
+            }
+            .welcome-subtitle { font-size: 11px; letter-spacing: 1px; color: #a8d5b8; margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
+            .welcome-title { font-size: 18px; font-weight: 700; color: #d8c281; margin-bottom: 4px; text-transform: uppercase; }
+            .welcome-msg { font-size: 13px; color: #f5f1e7; margin-bottom: 16px; }
+            .date-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: rgba(255,255,255,0.15);
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 11px;
+                font-weight: 700;
+                color: #d8c281;
+            }
+            
+            .timer-card {
+                background: #cba358;
+                border-radius: 16px;
+                padding: 16px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                color: #fff;
+            }
+            .timer-left .timer-label { font-size: 12px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+            .timer-left .timer-value { font-size: 32px; font-weight: 700; font-family: 'Lato', sans-serif; }
+            .timer-right { text-align: right; font-size: 12px; font-weight: 600; line-height: 1.6; }
+
+            .score-card {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 20px;
+            }
+            .score-circle-wrapper {
+                position: relative;
+                width: 70px; height: 70px;
+                border-radius: 50%;
+                background: conic-gradient(#103422 55%, #eaeaea 0);
+                display: flex; justify-content: center; align-items: center;
+            }
+            .score-circle-inner {
+                width: 58px; height: 58px;
+                background: #fff;
+                border-radius: 50%;
+                display: flex; flex-direction: column; justify-content: center; align-items: center;
+            }
+            .score-val { font-size: 18px; font-weight: 700; color: #103422; line-height: 1; }
+            .score-max { font-size: 10px; color: #8a9a8a; }
+
+            .score-info .score-title { font-size: 15px; font-weight: 700; color: #103422; margin-bottom: 8px; }
+            .progress-bar-bg { width: 100%; height: 6px; background: #eaeaea; border-radius: 3px; margin-bottom: 6px; }
+            .progress-bar-fill { width: 55%; height: 100%; background: #103422; border-radius: 3px; }
+            .score-detail { font-size: 11px; color: #8a9a8a; font-weight: 600; }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+                margin-bottom: 16px;
+            }
+            .stat-box {
+                background: #fff; border-radius: 16px; padding: 16px;
+                text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            }
+            .stat-icon { font-size: 24px; margin-bottom: 8px; }
+            .stat-val { font-size: 22px; font-weight: 700; color: #103422; }
+            .stat-label { font-size: 9px; font-weight: 700; color: #8a9a8a; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+            .citation-card {
+                background: #103422;
+                color: #fff;
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            .citation-title {
+                font-size: 10px; font-weight: 700; color: #d8c281; text-transform: uppercase; letter-spacing: 1px;
+                display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
+            }
+            .citation-text { font-family: 'Amiri', serif; font-size: 16px; line-height: 1.6; margin-bottom: 12px; }
+            .citation-source { font-size: 11px; color: #a8d5b8; text-align: right; font-style: italic; }
+
+            /* Dashboard Grid for Desktop */
+            .dashboard-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
+            @media (min-width: 1024px) {
+                .dashboard-layout { grid-template-columns: 2fr 1fr; }
+            }
+            .dashboard-col-left { display: flex; flex-direction: column; gap: 24px; }
+            .dashboard-col-right { display: flex; flex-direction: column; gap: 24px; }
+            
+            /* Remove margins since gap handles it now */
+            .welcome-card, .timer-card, .score-card, .stats-grid, .citation-card { margin-bottom: 0 !important; }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="dashboard-layout">
+            <!-- Left Column: Welcome, Citation, Timer -->
+            <div class="dashboard-col-left">
+        <!-- Welcome Card -->
+        <div class="welcome-card">
+            <!-- Subtitle: Ramadan Moubarak only during Ramadan, else Hijri date context -->
+            <div class="welcome-subtitle">
+                <h:outputText value="RAMADAN MOUBARAK"  rendered="#{userDashboardBean.ramadan}"/>
+                <h:outputText value="ASSALAMU ALAIKUM" rendered="#{!userDashboardBean.ramadan}"/>
+            </div>
+            <div class="welcome-title">BIENVENUE, <h:outputText value="#{authBean.user.nom}" style="text-transform:uppercase"/> !</div>
+            <div class="welcome-msg">
+                <h:outputText value="Que ce Ramadan soit plein de lumière" rendered="#{userDashboardBean.ramadan}"/>
+                <h:outputText value="Bonne continuation dans votre pratique spirituelle" rendered="#{!userDashboardBean.ramadan}"/>
+            </div>
+            <div class="date-badge">
+                📅 <h:outputText value="#{userDashboardBean.hijriDateBadge}" escape="false"/>
+            </div>
+            <!-- Decorative Moon -->
+            <div style="position:absolute; right:-20px; top:20px; font-size:80px; opacity:0.05;">🌙</div>
+        </div>
+
+        <!-- Timer Card -->
+        <div class="timer-card">
+            <div class="timer-left">
+                <div class="timer-label">🕌 #{userDashboardBean.nextEventName} dans...</div>
+                <!-- Dynamic countdown simulation -->
+                <div class="timer-value">#{userDashboardBean.formattedCountdown}</div>
+            </div>
+            <div class="timer-right">
+                <div style="margin-bottom:4px;">Imsak <h:outputText value="#{userDashboardBean.horaireAujourdhui != null ? userDashboardBean.horaireAujourdhui.imsak : '04:47'}"><f:convertDateTime pattern="HH:mm" type="localTime"/></h:outputText></div>
+                <div>Iftar <h:outputText value="#{userDashboardBean.horaireAujourdhui != null ? userDashboardBean.horaireAujourdhui.maghrib : '18:24'}"><f:convertDateTime pattern="HH:mm" type="localTime"/></h:outputText></div>
+            </div>
+        </div>
+
+                </div>
+            </div>
+
+            <!-- Right Column: Score, Stats -->
+            <div class="dashboard-col-right">
+                <!-- Score Card -->
+                <div class="card score-card">
+                    <div class="score-circle-wrapper">
+                        <div class="score-circle-inner">
+                            <div class="score-val">#{userDashboardBean.scoreDuJour}</div>
+                            <div class="score-max">/118</div>
+                        </div>
+                    </div>
+                    <div class="score-info" style="flex:1;">
+                        <div class="score-title">Score du jour</div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: #{userDashboardBean.progressPercentage}%"></div>
+                        </div>
+                        <div class="score-detail">#{userDashboardBean.progressPercentage}% — #{userDashboardBean.totalActesFaits} actes / #{userDashboardBean.totalActes} ✨</div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-val">#{userDashboardBean.moyenneScore}</div>
+                        <div class="stat-label">MOY. PTS/JOUR</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-val">#{userDashboardBean.meilleurJour}</div>
+                        <div class="stat-label">MEILLEUR SCORE</div>
+                    </div>
+                </div>
+            </div>
+        </ui:define>
+        
+    </ui:composition>
+
+

@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/templates/userLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-title {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                font-weight: 700;
+                color: #2a3a2a;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 20px;
+                margin-top: 10px;
+            }
+            .qibla-container {
+                background: #103422;
+                border-radius: 24px;
+                padding: 40px 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                color: #fff;
+                box-shadow: 0 10px 30px rgba(16,52,42,0.3);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            /* Decorative background rings */
+            .qibla-container::before {
+                content: '';
+                position: absolute; width: 300px; height: 300px;
+                border: 2px solid rgba(255,255,255,0.05);
+                border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            }
+
+            .qibla-location {
+                background: rgba(255,255,255,0.1);
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #d8c281;
+                margin-bottom: 40px;
+                z-index: 1;
+            }
+
+            .compass {
+                width: 200px;
+                height: 200px;
+                border-radius: 50%;
+                border: 8px solid rgba(255,215,0,0.15);
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 40px;
+                z-index: 1;
+            }
+            .compass-marks span {
+                position: absolute; font-size: 14px; font-weight: 700; color: #a8d5b8;
+            }
+            .compass-marks .n { top: 10px; left: 50%; transform: translateX(-50%); color: #fff; }
+            .compass-marks .e { right: 10px; top: 50%; transform: translateY(-50%); }
+            .compass-marks .s { bottom: 10px; left: 50%; transform: translateX(-50%); }
+            .compass-marks .w { left: 10px; top: 50%; transform: translateY(-50%); }
+
+            .kaaba-needle {
+                width: 30px;
+                height: 120px;
+                position: absolute;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                /* Simulated rotation from server */
+                transform: rotate(#{userHoraireQiblaBean.qiblaDegree}deg);
+                transition: transform 1s ease-out;
+            }
+            .kaaba-icon {
+                font-size: 40px;
+                margin-top: -30px; /* shift outside center */
+                filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+            }
+
+            .qibla-info { text-align: center; z-index: 1; }
+            .qibla-degree { font-size: 36px; font-weight: 700; font-family: 'Lato', sans-serif; margin-bottom: 8px; }
+            .qibla-desc { font-size: 13px; color: #a8d5b8; line-height: 1.5; }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="page-title">
+            <span>🧭</span> DIRECTION DE LA QIBLA
+        </div>
+
+        <div class="qibla-container">
+            <div class="qibla-location">🗺️ #{userHoraireQiblaBean.ville}</div>
+
+            <div class="compass">
+                <div class="compass-marks">
+                    <span class="n">N</span>
+                    <span class="e">E</span>
+                    <span class="s">S</span>
+                    <span class="w">W</span>
+                </div>
+                <div class="kaaba-needle">
+                    <span class="kaaba-icon">🕋</span>
+                </div>
+            </div>
+
+            <div class="qibla-info">
+                <div class="qibla-degree">#{userHoraireQiblaBean.qiblaDegree}°</div>
+                <div class="qibla-desc">Tournez-vous vers #{userHoraireQiblaBean.qiblaDegree}° depuis le Nord<br/>pour faire face à la Qibla.</div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/WEB-INF/templates/adminLayout.xhtml">
+
+    <ui:define name="styles">
+        <style>
+            .page-title {
+                font-size: 22px; font-weight: 700;
+                color: #1b3d2b; margin-bottom: 24px;
+            }
+
+            .profile-grid {
+                display: grid;
+                grid-template-columns: 300px 1fr;
+                gap: 24px;
+            }
+
+            /* ── CARTE GAUCHE ── */
+            .profile-card {
+                background: #fff;
+                border-radius: 16px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+                padding: 32px 24px;
+                text-align: center;
+            }
+            .profile-avatar-big {
+                width: 90px; height: 90px;
+                background: #1b3d2b;
+                border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 36px;
+                margin: 0 auto 16px;
+            }
+            .profile-fullname {
+                font-size: 18px; font-weight: 700;
+                color: #1b3d2b; margin-bottom: 6px;
+            }
+            .profile-email {
+                font-size: 12px; color: #8a9a8a;
+                margin-bottom: 16px;
+            }
+            .profile-badge {
+                display: inline-block;
+                background: #fef9e7; color: #b8860b;
+                border: 1px solid #ffd700;
+                border-radius: 20px;
+                padding: 6px 16px;
+                font-size: 12px; font-weight: 700;
+                margin-bottom: 24px;
+            }
+            .profile-info-list {
+                text-align: left;
+                border-top: 1px solid #f0ebe0;
+                padding-top: 20px;
+            }
+            .profile-info-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #f5f0e6;
+                font-size: 13px;
+            }
+            .info-label {
+                color: #8a9a8a; font-weight: 600;
+                font-size: 11px; text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .info-value {
+                color: #1b3d2b; font-weight: 700;
+            }
+
+            /* ── CARTE DROITE ── */
+            .edit-card {
+                background: #fff;
+                border-radius: 16px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+                padding: 28px;
+            }
+            .edit-card-title {
+                font-size: 16px; font-weight: 700;
+                color: #1b3d2b; margin-bottom: 24px;
+                padding-bottom: 14px;
+                border-bottom: 1px solid #f0ebe0;
+            }
+            .form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .form-group { display: flex; flex-direction: column; gap: 6px; }
+            .form-group.full { grid-column: 1 / -1; }
+            .form-label {
+                font-size: 11px; font-weight: 700;
+                color: #8a9a8a; text-transform: uppercase; letter-spacing: 1px;
+            }
+            .form-input, .form-select {
+                border: 1px solid #e0dbd0; border-radius: 8px;
+                padding: 10px 14px; font-size: 13px;
+                font-family: 'Lato', sans-serif; color: #2a3a2a;
+                outline: none; transition: border 0.2s;
+            }
+            .form-input:focus, .form-select:focus { border-color: #1b3d2b; }
+            .form-input:disabled {
+                background: #f5f0e6; color: #8a9a8a; cursor: not-allowed;
+            }
+
+            .section-divider {
+                font-size: 13px; font-weight: 700;
+                color: #1b3d2b; margin: 24px 0 16px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #f0ebe0;
+            }
+
+            .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+            .btn-save {
+                background: #1b3d2b; color: #f5f0e6;
+                border: none; border-radius: 10px;
+                padding: 12px 28px; font-size: 13px; font-weight: 700;
+                cursor: pointer; font-family: 'Lato', sans-serif;
+                transition: background 0.2s;
+            }
+            .btn-save:hover { background: #2d7a50; }
+
+            /* ── POPUP ── */
+            .popup-overlay {
+                display: none; position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999; align-items: center; justify-content: center;
+            }
+            .popup-overlay.show { display: flex; }
+            .popup-box {
+                background: #fff; border-radius: 20px;
+                padding: 36px; text-align: center;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+                max-width: 360px; width: 90%;
+                animation: fadeUp 0.3s ease;
+            }
+            @keyframes fadeUp {
+                from { opacity:0; transform:translateY(20px); }
+                to   { opacity:1; transform:translateY(0); }
+            }
+            .popup-icon { font-size: 52px; margin-bottom: 16px; }
+            .popup-title { font-size: 20px; font-weight: 700; color: #1b3d2b; margin-bottom: 8px; }
+            .popup-msg { font-size: 14px; color: #6a7a6a; margin-bottom: 28px; }
+            .popup-btn {
+                padding: 12px 28px; border-radius: 12px; border: none;
+                font-family: 'Lato', sans-serif; font-size: 14px; font-weight: 700;
+                cursor: pointer; background: #1b3d2b; color: #f5f0e6;
+            }
+            .popup-btn:hover { background: #2d7a50; }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <!-- POPUP SUCCÈS -->
+        <div class="popup-overlay" id="popupSuccess">
+            <div class="popup-box">
+                <div class="popup-icon">✅</div>
+                <div class="popup-title">Profil mis à jour !</div>
+                <div class="popup-msg">Vos informations ont été sauvegardées avec succès.</div>
+                <button class="popup-btn" onclick="closePopup()">OK</button>
+            </div>
+        </div>
+
+        <div class="page-title">👤 Mon Profil</div>
+
+        <div class="profile-grid">
+
+            <!-- ── CARTE GAUCHE : infos résumé ── -->
+            <div class="profile-card">
+                <div class="profile-avatar-big">
+                    #{authBean.user.genre.name() == 'Femme' ? '🧕' : '👑'}
+                </div>
+                <div class="profile-fullname">
+                    <h:outputText value="#{authBean.user.prenom} #{authBean.user.nom}"/>
+                </div>
+                <div class="profile-email">
+                    <h:outputText value="#{authBean.user.email}"/>
+                </div>
+                <div class="profile-badge">👑 Administrateur</div>
+
+                <div class="profile-info-list">
+                    <div class="profile-info-item">
+                        <span class="info-label">Ville</span>
+                        <span class="info-value">
+                            <h:outputText value="#{authBean.user.ville}"/>
+                        </span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="info-label">Genre</span>
+                        <span class="info-value">
+                            <h:outputText value="#{authBean.user.genre}"/>
+                        </span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="info-label">Membre depuis</span>
+                        <span class="info-value">
+                            <h:outputText value="#{authBean.user.dateInscreption}"/>
+                        </span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="info-label">Rôle</span>
+                        <span class="info-value">
+                            <h:outputText value="#{authBean.user.role}"/>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── CARTE DROITE : formulaire édition ── -->
+            <div class="edit-card">
+                <div class="edit-card-title">✏️ Modifier mes informations</div>
+
+                <h:form id="formProfil">
+
+                    <!-- Infos personnelles -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Prénom</label>
+                            <h:inputText value="#{profilBean.prenom}"
+                                         styleClass="form-input"
+                                         required="true"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nom</label>
+                            <h:inputText value="#{profilBean.nom}"
+                                         styleClass="form-input"
+                                         required="true"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <h:inputText value="#{profilBean.email}"
+                                         styleClass="form-input"
+                                         required="true"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ville</label>
+                            <h:inputText value="#{profilBean.ville}"
+                                         styleClass="form-input"/>
+                        </div>
+                    </div>
+
+                    <!-- Changer mot de passe -->
+                    <div class="section-divider">🔒 Changer le mot de passe</div>
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Ancien mot de passe</label>
+                            <h:inputSecret value="#{profilBean.ancienPassword}"
+                                           styleClass="form-input"
+                                           redisplay="true"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nouveau mot de passe</label>
+                            <h:inputSecret value="#{profilBean.nouveauPassword}"
+                                           styleClass="form-input"
+                                           redisplay="true"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmer mot de passe</label>
+                            <h:inputSecret value="#{profilBean.confirmerPassword}"
+                                           styleClass="form-input"
+                                           redisplay="true"/>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <h:commandButton value="💾 Sauvegarder"
+                                         styleClass="btn-save"
+                                         action="#{profilBean.sauvegarder}"/>
+                    </div>
+
+                    <!-- Déclencheur popup succès -->
+                    <h:panelGroup>
+                        <h:outputScript rendered="#{profilBean.updateSuccess}">
+                            document.getElementById('popupSuccess').classList.add('show');
+                        </h:outputScript>
+                    </h:panelGroup>
+
+                </h:form>
+            </div>
+
+        </div>
+
+        <script>
+            function closePopup() {
+                document.getElementById('popupSuccess').classList.remove('show');
+            }
+        </script>
+
+    </ui:define>
+
+</ui:composition>
+</html>

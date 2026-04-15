@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Connexion PostgreSQL -->
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="connection.url">jdbc:postgresql://localhost:5432/nour_elhouda</property>
+        <property name="connection.username">postgres</property>
+        <property name="connection.password">12345</property>
+        <!-- Contexte des sessions -->
+        <property name="hibernate.current_session_context_class">thread</property>
+
+        <!-- Dialecte PostgreSQL -->
+        <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+
+        <!-- Création automatique des tables -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <!-- Afficher le SQL -->
+        <property name="show_sql">true</property>
+        <property name="format_sql">true</property>
+
+        <!-- Cache désactivé -->
+        <property name="hibernate.cache.use_second_level_cache">false</property>
+
+
+
+        <!-- Mapping des entités -->
+        <mapping class="com.example.nourelhoudaapp.entites.Utilisateur"/>
+        <mapping class="com.example.nourelhoudaapp.entites.Acteadoration"/>
+        <mapping class="com.example.nourelhoudaapp.entites.SuiviJournalier"/>
+        <mapping class="com.example.nourelhoudaapp.entites.Citation"/>
+        <mapping class="com.example.nourelhoudaapp.entites.Conseil"/>
+        <mapping class="com.example.nourelhoudaapp.entites.Suiviregles"/>
+        <mapping class="com.example.nourelhoudaapp.entites.HorairePriere"/>
+        <mapping class="com.example.nourelhoudaapp.entites.ActePersonnel"/>
+
+    </session-factory>
+</hibernate-configuration>
