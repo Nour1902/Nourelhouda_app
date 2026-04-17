@@ -1,2 +1,2 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<% response.sendRedirect(request.getContextPath() + "/Auth/login.xhtml"); %>
+<% response.sendRedirect(request.getContextPath() + "/home.xhtml"); %>

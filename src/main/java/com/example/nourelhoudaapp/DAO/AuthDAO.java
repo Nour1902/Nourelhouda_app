@@ -3,6 +3,10 @@ package com.example.nourelhoudaapp.DAO;
 import com.example.nourelhoudaapp.HibernateUtil;
 import com.example.nourelhoudaapp.entites.Suiviregles;
 import com.example.nourelhoudaapp.entites.Utilisateur;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.validator.ValidatorException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.mindrot.jbcrypt.BCrypt;
@@ -36,6 +40,16 @@ public class AuthDAO implements Serializable {
         // on utilise le meme session et meme transaction car heberneit ne autorise pas
         // 2 transaction dans meme session
 
+    }
+    public void validateEmail(FacesContext context, UIComponent component, Object value)
+            throws ValidatorException {
+        String emailSaisi = (String) value;
+        String regex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$";
+        if (emailSaisi == null || !emailSaisi.matches(regex)) {
+            FacesMessage message = new FacesMessage("Ce n'est pas un format e-mail");
+            message.setSeverity(FacesMessage.SEVERITY_ERROR);
+            throw new ValidatorException(message);
+        }
     }
 
     // fonction pour inscrire

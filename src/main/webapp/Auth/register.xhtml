@@ -156,15 +156,18 @@
             transition: background 0.2s;
         }
         .btn-submit:hover { background: #2d7a50; }
-        .msg-error {
-            background: #fdecea;
-            border: 1px solid #f5c6c6;
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 13px;
-            color: #c0392b;
-            margin-bottom: 14px;
+        .btn-back {
             display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #8a9a8a;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 600;
+        }
+        .btn-back:hover {
+            color: #1b3d2b;
         }
     </style>
 </h:head>
@@ -260,6 +263,10 @@
             <h:commandButton value="Créer mon compte ✨"
                              styleClass="btn-submit"
                              action="#{authBean.Inscrire}"/>
+
+            <a href="../home.xhtml" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
         </h:form>
     </div>
 

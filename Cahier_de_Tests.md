@@ -1,18 +1,37 @@
-# Cahier de Recette et Scénarios de Tests — Nour El Houda
-
-**Projet :** Application de Suivi Spirituel du Ramadan "Nour El Houda"  
-**Technologie :** Jakarta EE, Hibernate, WildFly 30, PostgreSQL, JUnit 5  
-**Méthodologie de test :** Tests Unitaires Purs (sans base de données) — conformes aux bonnes pratiques de non-régression.
+# Projet : Application de Suivi Spirituel du Ramadan "Nour El Houda"  
 
 ---
 
-## 1. Identification des Fonctionnalités à Tester
+## 1. Stack Technique du Projet
+
+Cette section récapitule les technologies utilisées pour le développement et la validation de l'application.
+
+### Développement (Runtime)
+- **Framework Web** : Jakarta EE 11 (Jakarta Server Faces 4.0).
+- **Injection de dépendances** : CDI (Jakarta Contexts and Dependency Injection).
+- **Persistance (ORM)** : Hibernate 6.5.3.Final / Jakarta Persistence (JPA).
+- **Base de Données** : PostgreSQL 16.
+- **Serveur d'Application** : WildFly 39.0.1.Final.
+- **Sécurité** : jBCrypt 0.4 (pour le hachage sécurisé des mots de passe).
+- **Java** : OpenJDK 17/25.
+
+### Tests et Validation (Quality Assurance)
+- **Outil de Build** : Apache Maven 3.9.
+- **Framework de Test** : JUnit 5 (Jupiter).
+- **Mocking (Simulations)** : Mockito 5.14 + Mockito-inline (pour mocker les méthodes statiques et les constructeurs).
+- **Bytecode Manipulation** : Byte Buddy 1.17.5 (indispensable pour le support de Java 25 avec Mockito).
+
+---
+
+## 2. Identification des Fonctionnalités à Tester
 
 À partir du cahier des charges, les fonctionnalités ont été classées par criticité pour garantir la robustesse du projet sans intégrer de dépendances lourdes (base de données, serveur Jakarta EE) dans la suite de tests.
 
 | Priorité | Fonctionnalité | Classe de test |
 |---|---|---|
 | 🔴 HAUTE | Sécurité : Hachage et vérification des mots de passe | `AuthDAOTest` |
+| 🔴 HAUTE | Flux de Connexion et Aiguillage des Rôles (JSF) | `AuthBeanTest` |
+| 🔴 HAUTE | Requête de Connexion (Hibernate Mocké) | `AuthDAOTest` |
 | 🔴 HAUTE | Calcul de la Direction de la Qibla (formule sphérique) | `PrayerTimeServiceTest` |
 | 🟠 MOYENNE | Calcul de l'heure d'Imsak à partir du Fajr | `HorairePriereTest` |
 | 🟠 MOYENNE | Traduction Numéro → Nom de Mois Hijri en Arabe | `PrayerTimeServiceTest` |
@@ -109,14 +128,39 @@
 
 ---
 
+### Scénario 6 — `AuthBeanTest` : Flux de Connexion et Aiguillage des Rôles
+
+**Fonctionnalité testée :** `AuthBean.Connecter()`  
+**Objectif :** Valider la redirection correcte selon le rôle de l'utilisateur et la gestion des messages d'erreur sans serveur Jakarta EE.
+
+| ID | Nom du Cas | Entrée | Résultat Attendu | Résultat Obtenu | Statut |
+|---|---|---|---|---|---|
+| T6.1 | Connexion réussie (ADMIN) | User avec role=Admin | Redirection `dashboardAdmin.xhtml` | Conforme | ✅ |
+| T6.2 | Connexion réussie (USER) | User avec role=User | Redirection `dashboardUser.xhtml` | Conforme | ✅ |
+| T6.3 | Échec de connexion | DAO renvoie null | Retour `null` + message d'erreur JSF | Conforme | ✅ |
+
+---
+
+### Scénario 7 — `AuthDAOTest` : Requête de Connexion (Mocks Hibernate)
+
+**Fonctionnalité testée :** `AuthDAO.Connexion(email, password)`  
+**Objectif :** Garantir que la chaîne d'appels Hibernate (Session, Query) est correctement orchestrée et que le commit est effectué.
+
+| ID | Nom du Cas | Entrée | Résultat Attendu | Résultat Obtenu | Statut |
+|---|---|---|---|---|---|
+| T7.1 | Connexion avec succès | Email + Pass corrects | Utilisateur renvoyé + Commit appelé | Conforme | ✅ |
+
+---
+
 ## 3. Architecture des Fichiers de Tests
 
 ```
 src/test/java/com/example/nourelhoudaapp/
 ├── Controllers/
-│   └── UserStatsBeanTest.java     (Scénario 5 — Statistiques)
+│   ├── UserStatsBeanTest.java     (Scénario 5 — Statistiques)
+│   └── AuthBeanTest.java          (Scénario 6 — Flux Connexion)
 ├── DAO/
-│   └── AuthDAOTest.java           (Scénario 1 — Sécurité)
+│   └── AuthDAOTest.java           (Scénario 1 & 7 — Sécurité + Connexion)
 ├── Services/
 │   └── PrayerTimeServiceTest.java (Scénarios 3 & 4 — Hijri + Qibla)
 └── entites/
@@ -125,10 +169,6 @@ src/test/java/com/example/nourelhoudaapp/
 
 ## 4. Stratégie de Non-Régression
 
-Ces tests sont **isolés** de toute dépendance externe (réseau, base de données, serveur Jakarta EE). Ils peuvent être relancés automatiquement à chaque modification du code via la commande Maven :
+Ces tests sont **isolés** de toute dépendance externe (réseau, base de données, serveur Jakarta EE). Ils peuvent être relancés automatiquement à chaque modification du code .
 
-```bash
-mvn test
-```
-
-Le résultat attendu est `BUILD SUCCESS` avec `Tests run: 14, Failures: 0, Errors: 0`.
+Le résultat attendu est `BUILD SUCCESS` avec `Tests run: 18, Failures: 0, Errors: 0`.

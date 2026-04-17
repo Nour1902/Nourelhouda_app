@@ -95,7 +95,7 @@ public class AuthBean implements Serializable {
         FacesContext.getCurrentInstance()
                 .getExternalContext()
                 .invalidateSession();
-        return "/Auth/login.xhtml?faces-redirect=true";
+        return "/home.xhtml?faces-redirect=true";
     }
 
 }
